@@ -1,13 +1,13 @@
 # ============================
 # 1) Etapa de build (compila)
 # ============================
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar la solución y restaurar dependencias
-COPY *.sln ./
+# Copiar la solución y los proyectos
+COPY Alfred2.sln ./
 COPY Alfred2/*.csproj ./Alfred2/
-RUN dotnet restore
+RUN dotnet restore Alfred2.sln
 
 # Copiar el resto del código y publicar en Release
 COPY . .
