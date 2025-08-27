@@ -40,38 +40,40 @@ namespace Alfred2.OpenAIService;
             // 2) Payload con Structured Outputs (JSON Schema)
             var payload = new
             {
-                model = "gpt-4o-mini",
+                model = "gpt-4o-mini", // o "gpt-4.1-mini", ambos soportan Responses
+                // Podés seguir enviando "input" como mensajes compactados:
                 input = new object[] {
                     new { role = "system", content = system },
-                    new { role = "user",   content = context },
-                    new { role = "user",   content = userText }
+                    new { role = "user",   content = $"{context}\n\n{userText}" }
                 },
-                response_format = new
+                // 👇 Antes: response_format = {...}
+                // 👇 Ahora: va dentro de "text"
+                text = new
                 {
-                    type = "json_schema",
+                    format = "json_schema",
                     json_schema = new
                     {
                         name = "solicitud_schema",
+                        strict = true, // recomendable para que devuelva JSON 100% válido
                         schema = new
                         {
                             type = "object",
                             properties = new
                             {
-                                tipo = new { type = "string", @enum = new[] { "pedido", "turno" }, nullable = true },
-                                producto = new { type = "string", nullable = true },
-                                cantidad = new { type = "integer", nullable = true },
-                                direccion = new { type = "string", nullable = true },
-                                formaPago = new { type = "string", nullable = true },
-                                nombre = new { type = "string", nullable = true },
-                                faltan = new { type = "array", items = new { type = "string" } },
-                                copy = new { type = "string" }
+                                tipo      = new { type = "string",  enum_ = new[] { "pedido", "turno" }, nullable = true },
+                                producto  = new { type = "string",  nullable = true },
+                                cantidad  = new { type = "integer", nullable = true },
+                                direccion = new { type = "string",  nullable = true },
+                                formaPago = new { type = "string",  nullable = true },
+                                nombre    = new { type = "string",  nullable = true },
+                                faltan    = new { type = "array",   items = new { type = "string" } },
+                                copy      = new { type = "string" }
                             },
                             required = new[] { "faltan", "copy" }
                         }
                     }
-                }
-                // Si querés memoria:
-                // ,store = true, previous_response_id = "resp_xxx"
+                },
+                temperature = 0.2
             };
 
             var req = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
