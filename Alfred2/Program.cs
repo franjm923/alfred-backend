@@ -36,7 +36,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync(); // aplica migraciones pendientes
+    await db.Database.MigrateAsync();
+    // aplica migraciones pendientes
     // opcional: var ok = await db.Database.CanConnectAsync(); Console.WriteLine($"DB connect: {ok}");
 }
 app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
