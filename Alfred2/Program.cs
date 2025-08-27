@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Alfred2.DBContext;
 using Alfred2.OpenAIService;
-using Alfred2.Models;                   
+using Alfred2.Models;        
+using System.Net.Http.Headers;           
 
 
 
@@ -25,8 +26,21 @@ builder.Logging.AddConsole();
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Information);
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.Debug);
 
-// Servicios propios
-builder.Services.AddHttpClient<OpenAIChatService>();
+var openAiKey =
+    Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+    ?? builder.Configuration["OPENAI_API_KEY"];
+
+if (string.IsNullOrWhiteSpace(openAiKey))
+    throw new InvalidOperationException("Falta OPENAI_API_KEY");
+
+builder.Services.AddHttpClient<OpenAIChatService>(c =>
+{
+    c.BaseAddress = new Uri("https://api.openai.com/v1/");
+    c.DefaultRequestHeaders.Authorization =
+        new AuthenticationHeaderValue("Bearer", openAiKey);
+    c.DefaultRequestHeaders.Accept.Add(
+        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+});
 builder.Services.AddHttpClient("whatsapp");
 
 builder.Services.AddControllers();

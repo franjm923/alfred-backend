@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text;
-using System.Net.Http.Headers;
+
 using Alfred2.DTOs;
 using Alfred2.Models;
 
@@ -18,7 +18,7 @@ namespace Alfred2.OpenAIService;
         public OpenAIChatService(HttpClient http, IConfiguration cfg)
         {
             _http = http;
-            _apiKey = cfg[""];
+            _apiKey = cfg["OPENAI_API_KEY"] ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(_apiKey))
             {
                 _http.DefaultRequestHeaders.Authorization =
@@ -40,7 +40,7 @@ namespace Alfred2.OpenAIService;
             // 2) Payload con Structured Outputs (JSON Schema)
             var payload = new
             {
-                model = "gpt-4.1-mini",
+                model = "gpt-4o-mini",
                 input = new object[] {
                     new { role = "system", content = system },
                     new { role = "user",   content = context },
