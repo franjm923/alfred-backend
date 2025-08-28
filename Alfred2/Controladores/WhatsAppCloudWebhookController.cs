@@ -20,7 +20,7 @@ namespace Alfred2.Controladores
     [ApiController]
     [Route("webhook/whatsapp")]
     public class WhatsAppCloudWebhookController : ControllerBase
-{
+    {
         private readonly IConfiguration _cfg;
         private readonly IHttpClientFactory _httpFactory;
         private readonly AppDbContext _db;
@@ -75,8 +75,9 @@ namespace Alfred2.Controladores
 
                     foreach (var msg in messages.EnumerateArray())
                     {
-                        var from = msg.GetProperty("from").GetString();        // número del usuario (E.164)
-                        var type = msg.GetProperty("type").GetString();
+                        var rawFrom = msg.GetProperty("from").GetString() ?? "";
+                        var from    = NormalizeE164(rawFrom);                  // solo dígitos (ej: 54911XXXXXXX)
+                        var type    = msg.GetProperty("type").GetString();  
                         if (type != "text") continue;
 
                         var text = msg.GetProperty("text").GetProperty("body").GetString() ?? "";
@@ -155,27 +156,43 @@ namespace Alfred2.Controladores
         // --- Enviar mensaje al usuario usando Cloud API ---
         private async Task SendWhatsAppAsync(string toE164, string text)
         {
-            var token = _cfg["WHATSAPP_TOKEN"];
+            var token   = _cfg["WHATSAPP_TOKEN"];
             var phoneId = _cfg["WHATSAPP_PHONE_NUMBER_ID"];
-            var client = _httpFactory.CreateClient("whatsapp");
+            var client  = _httpFactory.CreateClient("whatsapp");
 
             client.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+            // Asegurar solo dígitos (sin '+', espacios ni 'whatsapp:')
+            var toDigits = NormalizeE164(toE164);
+            if (string.IsNullOrWhiteSpace(toDigits))
+            {
+                Console.WriteLine("[WA SEND] Número destino vacío");
+                return;
+            }
+
             var payload = new
             {
                 messaging_product = "whatsapp",
-                to = toE164,
+                to   = toDigits,          // ej: 54911XXXXXXXX
                 type = "text",
                 text = new { body = text }
             };
 
             var json = JsonSerializer.Serialize(payload);
-            var res = await client.PostAsync(
+            Console.WriteLine($"[WA SEND] -> to={toDigits} pid={phoneId} json={json}");
+
+            var res  = await client.PostAsync(
                 $"https://graph.facebook.com/v20.0/{phoneId}/messages",
                 new StringContent(json, Encoding.UTF8, "application/json"));
 
-            // (opcional) manejar errores/respuesta
+            var body = await res.Content.ReadAsStringAsync();
+            Console.WriteLine($"[WA SEND] {(int)res.StatusCode} {res.StatusCode} {body}");
+
+            // Pistas comunes:
+            // 400 => payload/número/ventana 24h/template/testers
+            // 401 => token inválido o vencido
+            // 403 => permisos o número no tester con app en modo Dev
         }
     
 
