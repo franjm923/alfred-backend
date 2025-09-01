@@ -61,6 +61,7 @@ namespace Alfred2.Controladores
         {
             using var reader = new StreamReader(Request.Body, Encoding.UTF8);
             var body = await reader.ReadToEndAsync();
+            Console.WriteLine($"[WA IN] {body}"); // <-- log
             using var doc = JsonDocument.Parse(body);
 
             // Busca el primer mensaje de texto
@@ -183,7 +184,7 @@ namespace Alfred2.Controladores
             Console.WriteLine($"[WA SEND] -> to={toDigits} pid={phoneId} json={json}");
 
             var res  = await client.PostAsync(
-                $"https://graph.facebook.com/v20.0/{phoneId}/messages",
+                $"https://graph.facebook.com/v23.0/{phoneId}/messages",
                 new StringContent(json, Encoding.UTF8, "application/json"));
 
             var body = await res.Content.ReadAsStringAsync();
