@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Alfred2.DBContext;
 using Alfred2.Models;
-
 using Alfred2.OpenAIService;
 using Alfred2.DTOs;
 
@@ -26,25 +25,33 @@ namespace Alfred2.Controladores
         [HttpPost("mensaje")]
         public async Task<IActionResult> Mensaje([FromBody] Inbound dto)
         {
-            if (string.IsNullOrWhiteSpace(dto?.Telefono) || string.IsNullOrWhiteSpace(dto?.Texto))
-                return BadRequest("Faltan datos mínimos (telefono, texto).");
+             if (string.IsNullOrWhiteSpace(dto?.TelefonoBot) ||
+                string.IsNullOrWhiteSpace(dto?.Telefono)   ||
+                string.IsNullOrWhiteSpace(dto?.Texto))
+                return BadRequest("Faltan datos mínimos (telefonoBot, telefono, texto).");
 
+            // 0) Usuario dueño del bot
+            var usr = await _db.Usuarios.FirstOrDefaultAsync(u => u.TelefonoBot == dto.TelefonoBot);
+            if (usr == null)
+                return BadRequest("Bot no reconocido");
+                
             // 1) Cliente (o crear)
-            var cli = await _db.Clientes.FirstOrDefaultAsync(c => c.Telefono == dto.Telefono);
+             var cli = await _db.Clientes
+                .FirstOrDefaultAsync(c => c.UsuarioId == usr.Id && c.Telefono == dto.Telefono);
             if (cli == null)
             {
-                cli = new Cliente { Telefono = dto.Telefono, Nombre = dto.Nombre ?? "Cliente" };
+                cli = new Cliente { Telefono = dto.Telefono, Nombre = dto.Nombre ?? "Cliente", UsuarioId = usr.Id };
                 _db.Clientes.Add(cli);
                 await _db.SaveChangesAsync();
             }
 
             // 2) Borrador actual
             var borrador = await _db.Solicitudes
-                .FirstOrDefaultAsync(s => s.ClienteId == cli.Id && s.Estado == EstadoSolicitud.Borrador);
+                .FirstOrDefaultAsync(s => s.ClienteId == cli.Id && s.UsuarioId == usr.Id && s.Estado == EstadoSolicitud.Borrador);
 
             if (borrador == null)
             {
-                borrador = new Solicitud { ClienteId = cli.Id, NombreCliente = cli.Nombre };
+                borrador = new Solicitud { ClienteId = cli.Id, NombreCliente = cli.Nombre, UsuarioId = usr.Id };
                 _db.Solicitudes.Add(borrador);
                 await _db.SaveChangesAsync();
             }

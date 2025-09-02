@@ -16,10 +16,10 @@ namespace Alfred2.Controladores
         public AdminController(AppDbContext db) { _db = db; }
 
         [HttpGet("pendientes")]
-        public async Task<IActionResult> Pendientes()
+        public async Task<IActionResult> Pendientes([FromQuery] int usuarioId)
         {
             var list = await _db.Solicitudes
-                .Where(s => s.Estado == EstadoSolicitud.Pendiente)
+                .Where(s => s.UsuarioId == usuarioId && s.Estado == EstadoSolicitud.Pendiente)
                 .OrderByDescending(s => s.Creado)
                 .Select(s => new {
                     s.Id,
@@ -38,10 +38,11 @@ namespace Alfred2.Controladores
         }
 
         [HttpPost("{id}/aceptar")]
-        public async Task<IActionResult> Aceptar(int id, [FromBody] AceptarDTO dto)
+        public async Task<IActionResult> Aceptar(int id, [FromQuery] int usuarioId, [FromBody] AceptarDTO dto)
         {
-            var s = await _db.Solicitudes.FindAsync(id);
-            if (s == null || s.Estado != EstadoSolicitud.Pendiente) return NotFound();
+            var s = await _db.Solicitudes
+                .FirstOrDefaultAsync(x => x.Id == id && x.UsuarioId == usuarioId && x.Estado == EstadoSolicitud.Pendiente);
+            if (s == null) return NotFound();
 
             s.PrecioEnvio = dto.PrecioEnvio;
             s.PrecioTotal = dto.PrecioTotal;

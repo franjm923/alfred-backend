@@ -21,6 +21,27 @@ namespace Alfred2.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.Entity("Alfred2.Models.Usuario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nombre")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TelefonoBot")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TelefonoBot")
+                        .IsUnique();
+
+                    b.ToTable("Usuarios");
+                });
 
             modelBuilder.Entity("Alfred2.Models.Cliente", b =>
                 {
@@ -38,7 +59,10 @@ namespace Alfred2.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Telefono")
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("UsuarioId", "Telefono")
                         .IsUnique();
 
                     b.ToTable("Clientes");
@@ -85,9 +109,14 @@ namespace Alfred2.Migrations
                     b.Property<int>("Tipo")
                         .HasColumnType("integer");
 
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteId", "Creado");
+
+                    b.HasIndex("UsuarioId", "Estado", "Creado");
 
                     b.ToTable("Solicitudes");
                 });
@@ -100,14 +129,71 @@ namespace Alfred2.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Alfred2.Models.Usuario", "Usuario")
+                        .WithMany("Solicitudes")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Cliente");
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Alfred2.Models.Cliente", b =>
                 {
+                    b.HasOne("Alfred2.Models.Usuario", "Usuario")
+                       .WithMany("Clientes")
+                       .HasForeignKey("UsuarioId")
+                       .OnDelete(DeleteBehavior.Cascade)
+                       .IsRequired();
+
+                    b.Navigation("Usuario");
+
+                    b.Navigation("Solicitudes");
+                });
+
+            modelBuilder.Entity("Alfred2.Models.Usuario", b =>
+                {
+                    b.HasOne("Alfred2.Models.Usuario", "Usuario")
+                       .WithMany("Clientes")
+                       .HasForeignKey("UsuarioId")
+                       .OnDelete(DeleteBehavior.Cascade)
+                       .IsRequired();
+
+                    b.Navigation("Usuario");
+
+                    b.Navigation("Solicitudes");
+                });
+
+            modelBuilder.Entity("Alfred2.Models.Usuario", b =>
+                {
+                    b.HasOne("Alfred2.Models.Usuario", "Usuario")
+                       .WithMany("Clientes")
+                       .HasForeignKey("UsuarioId")
+                       .OnDelete(DeleteBehavior.Cascade)
+                       .IsRequired();
+
+                    b.Navigation("Usuario");
+
+                    b.Navigation("Solicitudes");
+                });
+
+            modelBuilder.Entity("Alfred2.Models.Usuario", b =>
+                {
+                    b.HasOne("Alfred2.Models.Usuario", "Usuario")
+                        .WithMany("Clientes")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                    b.Navigation("Usuario");
+                    b.Navigation("Solicitudes");
+                });
+                modelBuilder.Entity("Alfred2.Models.Usuario", b =>
+                {
+                    b.Navigation("Clientes");
                     b.Navigation("Solicitudes");
                 });
 #pragma warning restore 612, 618
-        }
+                }
     }
 }

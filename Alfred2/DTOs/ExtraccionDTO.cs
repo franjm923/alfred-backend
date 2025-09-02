@@ -7,6 +7,7 @@ namespace Alfred2.DTOs
     // Entrada del bot (desde WhatsApp/tu canal)
     public class Inbound
     {
+         public string TelefonoBot { get; set; }
         public string Telefono { get; set; }
         public string Nombre { get; set; }
         public string Texto { get; set; }

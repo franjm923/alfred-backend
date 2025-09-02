@@ -73,18 +73,21 @@ namespace Alfred2.Controladores
                 {
                     var value = change.GetProperty("value");
                     if (!value.TryGetProperty("messages", out var messages)) continue;
+                    
+                     var botNumber = value.GetProperty("metadata")
+                        .GetProperty("display_phone_number").GetString() ?? "";
 
                     foreach (var msg in messages.EnumerateArray())
                     {
                         var rawFrom = msg.GetProperty("from").GetString() ?? "";
-                        var from    = NormalizeE164(rawFrom);                  // solo dígitos (ej: 54911XXXXXXX)
-                        var type    = msg.GetProperty("type").GetString();  
+                        var from = NormalizeE164(rawFrom);                  // solo dígitos (ej: 54911XXXXXXX)
+                        var type = msg.GetProperty("type").GetString();
                         if (type != "text") continue;
 
                         var text = msg.GetProperty("text").GetProperty("body").GetString() ?? "";
 
                         // Lógica de tu bot (igual que en BotController)
-                        var reply = await HandleIncomingAsync(from, text);
+                        var reply = await HandleIncomingAsync(from, botNumber, text);
                         if (!string.IsNullOrWhiteSpace(reply))
                             await SendWhatsAppAsync(from, reply);
                     }
@@ -94,25 +97,32 @@ namespace Alfred2.Controladores
         }
 
         // --- MINI BOT FLOW (mismo que BotController.Mensaje, compactado) ---
-        private async Task<string> HandleIncomingAsync(string telefono, string texto)
+       private async Task<string> HandleIncomingAsync(string telefono, string telefonoBot, string texto)
         {
-            if (string.IsNullOrWhiteSpace(telefono) || string.IsNullOrWhiteSpace(texto)) return null;
+            if (string.IsNullOrWhiteSpace(telefono) ||
+                string.IsNullOrWhiteSpace(telefonoBot) ||
+                string.IsNullOrWhiteSpace(texto)) return null;
+
+            // Usuario dueño
+            var usr = await _db.Usuarios.FirstOrDefaultAsync(u => u.TelefonoBot == telefonoBot);
+            if (usr == null) return null;
 
             // Cliente o crear
-            var cli = await _db.Clientes.FirstOrDefaultAsync(c => c.Telefono == telefono);
+           var cli = await _db.Clientes
+                .FirstOrDefaultAsync(c => c.UsuarioId == usr.Id && c.Telefono == telefono);
             if (cli == null)
             {
-                cli = new Cliente { Telefono = telefono, Nombre = "Cliente" };
+                cli = new Cliente { Telefono = telefono, Nombre = "Cliente", UsuarioId = usr.Id };
                 _db.Clientes.Add(cli);
                 await _db.SaveChangesAsync();
             }
 
             // Borrador
             var borrador = await _db.Solicitudes
-                .FirstOrDefaultAsync(s => s.ClienteId == cli.Id && s.Estado == EstadoSolicitud.Borrador);
+                .FirstOrDefaultAsync(s => s.ClienteId == cli.Id && s.UsuarioId == usr.Id && s.Estado == EstadoSolicitud.Borrador);
             if (borrador == null)
             {
-                borrador = new Solicitud { ClienteId = cli.Id, NombreCliente = cli.Nombre };
+                 borrador = new Solicitud { ClienteId = cli.Id, NombreCliente = cli.Nombre, UsuarioId = usr.Id };
                 _db.Solicitudes.Add(borrador);
                 await _db.SaveChangesAsync();
             }
