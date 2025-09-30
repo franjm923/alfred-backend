@@ -1,89 +1,118 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Alfred2.Models; // Asumiendo que Solicitud está aquí
+using System.Text.Json.Serialization;
+using Alfred2.Models; // Para ModalidadTurno
 
 namespace Alfred2.DTOs
 {
-    // Entrada del bot (desde WhatsApp/tu canal)
+    // Entrada del bot (desde WhatsApp u otro canal)
     public class Inbound
     {
-         public string TelefonoBot { get; set; }
-        public string Telefono { get; set; }
-        public string Nombre { get; set; }
-        public string Texto { get; set; }
+        public string TelefonoBot { get; set; } = string.Empty; // línea del médico (E164 sin '+')
+        public string Telefono { get; set; } = string.Empty;    // paciente (E164 sin '+')
+        public string? Nombre { get; set; }                     // opcional, nombre del paciente
+        public string Texto { get; set; } = string.Empty;       // mensaje libre
     }
 
-    // Aceptar pedido desde admin
-    public class AceptarDTO
+    // Confirmar/cerrar un turno desde el panel admin
+    public class ConfirmarTurnoDTO
     {
-        public decimal PrecioEnvio { get; set; }
-        public decimal PrecioTotal { get; set; }
+        public decimal? PrecioAcordado { get; set; }
+        public ModalidadTurno? Modalidad { get; set; } // Presencial/Virtual (opcional al confirmar)
+        public string? Notas { get; set; }
     }
 
-    // Salida del LLM (Structured Output)
-    public class ExtraccionDTO
+    // Cancelar un turno
+    public class CancelarTurnoDTO
     {
-        public string Tipo { get; set; }       // "pedido" | "turno"
-        public string Producto { get; set; }
-        public int? Cantidad { get; set; }
-        public string Direccion { get; set; }
-        public string FormaPago { get; set; }
-        public string Nombre { get; set; }
+        public string? Motivo { get; set; }
+    }
+
+    // (Opcional) Reprogramar un turno
+    public class ReprogramarTurnoDTO
+    {
+        // Fecha/hora LOCAL del médico (se convertirá a UTC en el controller/servicio)
+        public DateTime NuevaFechaHoraLocal { get; set; }
+        public int? NuevaDuracionMin { get; set; }
+        public Guid? NuevoServicioId { get; set; }
+        public ModalidadTurno? NuevaModalidad { get; set; }
+        public string? Notas { get; set; }
+    }
+
+    // Salida de un extractor (LLM u otro) orientado a TURNOS
+    public class ExtraccionTurnoDTO
+    {
+        public string? Servicio { get; set; }           // nombre del servicio (match por nombre)
+        public DateTime? LocalInicio { get; set; }      // fecha/hora LOCAL del médico
+        public int? DuracionMin { get; set; }           // duración sugerida
+        public ModalidadTurno? Modalidad { get; set; }  // Presencial/Virtual
+        public string? Nombre { get; set; }             // nombre del paciente (si lo captura)
         public List<string> Faltan { get; set; } = new();
-        public string Copy { get; set; }       // texto breve para repreguntar
+        public string? Copy { get; set; }               // texto breve para repreguntar
 
-        public static ExtraccionDTO ParseExtraccionFromResponses(string json, Solicitud borradorActual)
+        /// <summary>
+        /// Intenta parsear una respuesta de un LLM con distintos formatos comunes:
+        ///  - { "output_parsed": { ...dto... } }
+        ///  - { "output": [ { "content": [ { "type": "output_json", "json": { ...dto... } }, ... ] } ] }
+        ///  - { "output": [ { "content": [ { "type": "output_text", "text": "{...dto...}" } ] } ] }
+        /// Devuelve un DTO vacío si no encuentra nada.
+        /// </summary>
+        public static ExtraccionTurnoDTO TryParseFromResponse(string json)
         {
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-
-            // 1) Si existe 'output_parsed' (algunos SDK/formatos lo exponen), úsalo directo
-            if (root.TryGetProperty("output_parsed", out var parsed))
+            try
             {
-                var dto = JsonSerializer.Deserialize<ExtraccionDTO>(parsed.GetRawText());
-                return dto ?? new ExtraccionDTO { Faltan = new List<string> { "direccion" }, Copy = "¿A qué dirección lo mandamos?" };
-            }
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
 
-            // 2) Recorrer 'output' -> 'content' y buscar un bloque JSON estructurado
-            if (root.TryGetProperty("output", out var output) && output.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var item in output.EnumerateArray())
+                // 1) output_parsed directo
+                if (root.TryGetProperty("output_parsed", out var parsed))
                 {
-                    if (item.TryGetProperty("content", out var content) && content.ValueKind == JsonValueKind.Array)
+                    var dto = JsonSerializer.Deserialize<ExtraccionTurnoDTO>(parsed.GetRawText());
+                    return dto ?? new ExtraccionTurnoDTO();
+                }
+
+                // 2) recorrer output -> content
+                if (root.TryGetProperty("output", out var output) && output.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in output.EnumerateArray())
                     {
+                        if (!item.TryGetProperty("content", out var content) || content.ValueKind != JsonValueKind.Array)
+                            continue;
+
                         foreach (var c in content.EnumerateArray())
                         {
-                            if (c.TryGetProperty("type", out var t))
+                            if (!c.TryGetProperty("type", out var t)) continue;
+                            var type = t.GetString();
+
+                            // a) output_json
+                            if (type == "output_json" && c.TryGetProperty("json", out var jsonEl))
                             {
-                                var type = t.GetString();
-                                // a) Ideal: 'output_json' con un objeto 'json'
-                                if (type == "output_json" && c.TryGetProperty("json", out var jsonEl))
+                                var dto = JsonSerializer.Deserialize<ExtraccionTurnoDTO>(jsonEl.GetRawText());
+                                if (dto != null) return dto;
+                            }
+
+                            // b) output_text que contiene JSON
+                            if (type == "output_text" && c.TryGetProperty("text", out var textEl))
+                            {
+                                var text = textEl.GetString();
+                                if (!string.IsNullOrWhiteSpace(text) && text.TrimStart().StartsWith("{"))
                                 {
-                                    var dto = JsonSerializer.Deserialize<ExtraccionDTO>(jsonEl.GetRawText());
-                                    if (dto != null) return dto;
-                                }
-                                // b) Fallback: 'output_text' que sea un JSON en texto
-                                if (type == "output_text" && c.TryGetProperty("text", out var textEl))
-                                {
-                                    var text = textEl.GetString();
-                                    if (!string.IsNullOrWhiteSpace(text) && text.TrimStart().StartsWith("{"))
+                                    try
                                     {
-                                        try
-                                        {
-                                            var dto = JsonSerializer.Deserialize<ExtraccionDTO>(text);
-                                            if (dto != null) return dto;
-                                        }
-                                        catch {/* ignore */}
+                                        var dto = JsonSerializer.Deserialize<ExtraccionTurnoDTO>(text);
+                                        if (dto != null) return dto;
                                     }
+                                    catch { /* ignorar */ }
                                 }
                             }
                         }
                     }
                 }
             }
+            catch { /* ignorar parse errors */ }
 
-            // 3) Último recurso: pregunta por dirección
-            return new ExtraccionDTO { Faltan = new List<string> { "direccion" }, Copy = "¿A qué dirección lo mandamos?" };
+            return new ExtraccionTurnoDTO();
         }
     }
 }
