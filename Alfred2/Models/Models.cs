@@ -56,6 +56,8 @@ public class Medico : EntidadBase
     public bool AutoResponderHabilitado { get; set; } = true;
     [MaxLength(800)] public string? TextoAutoResponder { get; set; }
 
+    public Guid? UserId { get; set; } // relación 1–1 con User (opcional)
+    public User? User { get; set; }
     public ICollection<Paciente> Pacientes { get; set; } = new List<Paciente>();
     public ICollection<Servicio> Servicios { get; set; } = new List<Servicio>();
     public ICollection<Turno> Turnos { get; set; } = new List<Turno>();
@@ -63,6 +65,26 @@ public class Medico : EntidadBase
     public ICollection<DisponibilidadSemanal> Disponibilidades { get; set; } = new List<DisponibilidadSemanal>();
     public ICollection<BloqueoAgenda> Bloqueos { get; set; } = new List<BloqueoAgenda>();
     public ICollection<IntegracionCalendario> Integraciones { get; set; } = new List<IntegracionCalendario>();
+}
+[Index(nameof(Email), IsUnique = true)]
+public class User : EntidadBase
+{
+    [Required, MaxLength(160)] public string Email { get; set; } = string.Empty;
+
+    // Si usa login clásico
+    public string? PasswordHash { get; set; }
+
+    // Si usa login con Google
+    [MaxLength(80)] public string? GoogleSub { get; set; } // el "sub" único que da Google
+    public string? Name { get; set; }
+    public string? Picture { get; set; }
+
+    // Roles: medico / admin / staff
+    [MaxLength(30)] public string Role { get; set; } = "medico";
+
+    // Relación 1–1 con Medico (para MVP salud)
+    public Guid? MedicoId { get; set; }
+    public Medico? Medico { get; set; }
 }
 
 /// <summary>

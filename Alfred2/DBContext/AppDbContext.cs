@@ -9,6 +9,7 @@ namespace Alfred2.DBContext
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         // DbSets nuevos (MVP médicos)
+         public DbSet<User> Users => Set<User>();
         public DbSet<Medico> Medicos => Set<Medico>();
         public DbSet<Paciente> Pacientes => Set<Paciente>();
         public DbSet<Servicio> Servicios => Set<Servicio>();
@@ -19,7 +20,7 @@ namespace Alfred2.DBContext
         public DbSet<BloqueoAgenda> Bloqueos => Set<BloqueoAgenda>();
         public DbSet<IntegracionCalendario> Integraciones => Set<IntegracionCalendario>();
         public DbSet<TurnoSyncCalendario> TurnoSincronizaciones => Set<TurnoSyncCalendario>();
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
