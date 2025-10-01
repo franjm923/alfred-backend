@@ -83,6 +83,8 @@ builder.Services.AddAuthentication(o =>
     o.Scope.Add("openid");
     o.Scope.Add("email");
     o.Scope.Add("profile");
+     // 👇 este es el callback donde Google te devuelve el token
+    o.CallbackPath = "/signin-google";
     // Más adelante, para Calendar:
     // o.Scope.Add("https://www.googleapis.com/auth/calendar.events");
     // o.AccessType = "offline";
