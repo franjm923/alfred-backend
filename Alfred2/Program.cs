@@ -171,7 +171,14 @@ app.MapGet("/api/me", async (HttpContext ctx, AppDbContext db) =>
         user.Name,
         user.Picture,
         Role = user.Role,
-        MedicoId = user.MedicoId
+        // Si tiene un médico asociado lo devolvemos también
+        Medico = user.Medico == null ? null : new
+        {
+            user.Medico.Id,
+            user.Medico.NombreCompleto,
+            user.Medico.Especialidad,
+            user.Medico.Matricula
+        }
     });
 }).RequireAuthorization();
 
