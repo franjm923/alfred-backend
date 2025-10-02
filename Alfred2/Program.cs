@@ -7,10 +7,13 @@ using System.Net.Http.Headers;
 
 // 👇 Nuevos using para auth/cookies/google/claims/proxy
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Security.Claims;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -144,45 +147,129 @@ app.MapGet("/logout", async (HttpContext ctx) =>
     await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.Ok(new { ok = true });
 });
-
-// Devuelve datos del usuario autenticado (para Home/Perfil)
-app.MapGet("/api/me", async (HttpContext ctx, AppDbContext db) =>
+//autorización por roles:
+app.MapGet("/api/admin/users", [Authorize(Roles = Roles.Admin)] async (AppDbContext db) =>
 {
-    if (!(ctx.User.Identity?.IsAuthenticated ?? false))
+    return await db.Users.ToListAsync();
+});
+//Cuando devuelvas datos, asegurate de filtrar por MedicoId salvo que el rol sea admin.
+app.MapGet("/api/turnos", async (ClaimsPrincipal user, [FromServices] AppDbContext db) =>
+{
+     var role = user.FindFirst(ClaimTypes.Role)?.Value ?? Roles.Medico;
+
+    if (role == Roles.Admin)
+    {
+        return Results.Ok(await db.Turnos.ToListAsync());
+    }
+
+    if (role == Roles.Soporte)
+    {
+        return Results.Forbid(); // soporte no puede ver turnos
+    }
+
+    // default: medico → solo sus turnos
+    var userEmail = user.FindFirst("email")?.Value;
+    if (string.IsNullOrEmpty(userEmail))
         return Results.Unauthorized();
 
-    var sub = ctx.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-    var email = ctx.User.FindFirst("email")?.Value;
-    var name = ctx.User.Identity?.Name ?? email;
-    var picture = ctx.User.FindFirst("picture")?.Value;
+    var medico = await db.Medicos.FirstOrDefaultAsync(m => m.Email == userEmail);
+    if (medico == null) return Results.NotFound();
 
-    var user = await db.Users.Include(u => u.Medico)
-        .FirstOrDefaultAsync(u => u.GoogleSub == sub || u.Email == email);
+    var turnos = await db.Turnos.Where(t => t.MedicoId == medico.Id).ToListAsync();
+    return Results.Ok(turnos);
+})
+.RequireAuthorization(); // 👈 asegura que solo usuarios logueados accedan
 
-    if (user == null)
+// Devuelve datos del usuario autenticado (para Home/Perfil)
+app.MapGet("/api/me", async (ClaimsPrincipal user, [FromServices] AppDbContext db) =>
+{
+    if (!(user.Identity?.IsAuthenticated ?? false))
+        return Results.Unauthorized();
+
+    var sub = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var email = user.FindFirst("email")?.Value;
+    var name = user.Identity?.Name ?? email;
+    var picture = user.FindFirst("picture")?.Value;
+
+    // Buscamos si ya existe en la BD
+    var u = await db.Users.Include(x => x.Medico)
+        .FirstOrDefaultAsync(x => x.GoogleSub == sub || x.Email == email);
+
+    if (u == null)
     {
-        // primera vez → creamos usuario
-        user = new User { GoogleSub = sub, Email = email!, Name = name, Picture = picture, Role = "medico" };
-        db.Users.Add(user);
+        // Primera vez → creamos usuario
+        var role = email == "franjuarez2013@gmail.com"
+            ? Roles.Admin
+            : Roles.Medico;
+
+        u = new User
+        {
+            GoogleSub = sub,
+            Email = email!,
+            Name = name ?? "",
+            Picture = picture,
+            Role = role
+        };
+
+        // Si es médico o admin → creamos un Medico base
+        if (role == Roles.Medico || role == Roles.Admin)
+        {
+            u.Medico = new Medico
+            {
+                NombreCompleto = name ?? email!,
+                Email = email!,
+                Especialidad = null,
+                Matricula = null
+            };
+        }
+
+        db.Users.Add(u);
+        await db.SaveChangesAsync();
+    }
+    else
+    {
+        // Si existe pero no tiene rol → corregimos
+        if (string.IsNullOrEmpty(u.Role))
+        {
+            u.Role = email == "franjuarez2013@gmail.com"
+                ? Roles.Admin
+                : Roles.Medico;
+        }
+
+        // Si es medico/admin y no tiene Medico → creamos ahora
+        if ((u.Role == Roles.Medico || u.Role == Roles.Admin) && u.Medico == null)
+        {
+            u.Medico = new Medico
+            {
+                NombreCompleto = u.Name ?? u.Email,
+                Email = u.Email,
+                Especialidad = null,
+                Matricula = null
+            };
+        }
+
+        db.Users.Update(u);
         await db.SaveChangesAsync();
     }
 
-    return Results.Ok(new {
-        user.Id,
-        user.Email,
-        user.Name,
-        user.Picture,
-        Role = user.Role,
-        // Si tiene un médico asociado lo devolvemos también
-        Medico = user.Medico == null ? null : new
+    // Devolvemos los datos
+    return Results.Ok(new
+    {
+        u.Id,
+        u.Email,
+        u.Name,
+        u.Picture,
+        Role = u.Role,
+        Medico = u.Medico == null ? null : new
         {
-            user.Medico.Id,
-            user.Medico.NombreCompleto,
-            user.Medico.Especialidad,
-            user.Medico.Matricula
+            u.Medico.Id,
+            u.Medico.NombreCompleto,
+            u.Medico.Especialidad,
+            u.Medico.Matricula
         }
     });
-}).RequireAuthorization();
+})
+.RequireAuthorization();
 
 // ===== Controllers =====
 app.MapControllers();
