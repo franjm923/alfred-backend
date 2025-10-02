@@ -82,7 +82,7 @@ public class User : EntidadBase
     public string? Picture { get; set; }
 
     // Roles: medico / admin / staff
-    [MaxLength(30)] public string Role { get; set; } = "medico";
+    [MaxLength(30)] public string Role { get; set; } = Roles.Medico;
 
     
    
@@ -260,6 +260,12 @@ public class IntegracionCalendario : EntidadBase
     public DateTime? ExpiraUtc { get; set; }
 
     public ICollection<TurnoSyncCalendario> Sincronizaciones { get; set; } = new List<TurnoSyncCalendario>();
+}
+public static class Roles
+{
+    public const string Admin = "admin";
+    public const string Soporte = "soporte";
+    public const string Medico = "medico";
 }
 
 /// <summary>
