@@ -1,0 +1,118 @@
+# ✅ Configuración Completada para Localhost
+
+## 📝 Resumen de Cambios
+
+Se actualizó el archivo `appsettings.json` con todas las variables necesarias para correr en localhost:
+
+### Variables Agregadas:
+
+#### Google Calendar (NUEVAS)
+- ✅ GCAL_REDIRECT_URI: http://localhost:10000/calendar/oauth-callback
+- ✅ GCAL_SCOPES: https://www.googleapis.com/auth/calendar.events
+
+#### Twilio WhatsApp
+- ✅ TWILIO_ACCOUNT_SID
+- ✅ TWILIO_AUTH_TOKEN  
+- ✅ TWILIO_FROM: whatsapp:+14155238886
+
+#### Frontend & CORS
+- ✅ ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+- ✅ FRONTEND_REDIRECT_URL: http://localhost:3000/home
+- ✅ PUBLIC_BASE_URL: http://localhost:10000
+
+#### Feature Flags
+- ✅ FeatureFlags:INTENT_MODE: simple
+- ✅ FeatureFlags:CALENDAR_MODE: simulate
+- ✅ FeatureFlags:PERSIST_TURNOS: true
+
+#### WhatsApp Provider
+- ✅ WH_PROVIDER: twilio
+- ✅ WHATSAPP_VERIFY_TOKEN: alfred_verify_token_local
+
+## 📋 Variables que Debes Configurar
+
+### Obligatorias para Login:
+```json
+"GOOGLE_CLIENT_ID": "tu-id.apps.googleusercontent.com",
+"GOOGLE_CLIENT_SECRET": "GOCSPX-tu-secret",
+"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Port=5432;Database=alfred;Username=postgres;Password=TU_PASSWORD"
+}
+```
+
+### Opcionales (solo si usas OpenAI LLM):
+```json
+"OpenAI": {
+  "ApiKey": "sk-proj-tu-key"
+}
+```
+
+### Opcionales (solo si pruebas WhatsApp):
+```json
+"TWILIO_ACCOUNT_SID": "ACxxxx",
+"TWILIO_AUTH_TOKEN": "tu-token"
+```
+
+## 🚀 Cómo Ejecutar
+
+### 1. Configurar Base de Datos
+```bash
+# Crear database en PostgreSQL
+createdb alfred
+```
+
+### 2. Actualizar appsettings.json
+Edita `Backend/Alfred2/appsettings.json`:
+- ConnectionString con tu password de PostgreSQL
+- GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET
+
+### 3. Ejecutar Backend
+```bash
+cd Backend/Alfred2
+dotnet run
+```
+
+Backend disponible en: http://localhost:10000
+
+### 4. Verificar
+- Health check: http://localhost:10000/healthz
+- Debe responder: {"status":"ok"}
+
+### 5. Ejecutar Frontend (opcional)
+```bash
+cd Frontend/FrontendWeb
+npm install
+npm run dev
+```
+
+Frontend disponible en: http://localhost:3000
+
+## 📚 Archivos Creados
+
+1. **appsettings.json** - Actualizado con todas las variables para localhost
+2. **.env.example** - Documentación de todas las variables disponibles
+3. **LOCALHOST.md** - Guía completa paso a paso
+4. **verify-localhost.ps1** - Script de verificación automática
+
+## 🔍 Diferencias Localhost vs Render
+
+| Variable | Localhost | Render (Production) |
+|----------|-----------|---------------------|
+| GCAL_REDIRECT_URI | http://localhost:10000/calendar/oauth-callback | https://tu-backend.onrender.com/calendar/oauth-callback |
+| ALLOWED_ORIGINS | http://localhost:3000 | https://alfred-frontend.vercel.app |
+| FRONTEND_REDIRECT_URL | http://localhost:3000/home | https://alfred-frontend.vercel.app/home |
+| PUBLIC_BASE_URL | http://localhost:10000 | https://tu-backend.onrender.com |
+| FeatureFlags:CALENDAR_MODE | simulate | real |
+
+## ✅ Todo Listo!
+
+El proyecto está configurado para correr en localhost. Solo necesitas:
+
+1. ✅ Tener PostgreSQL corriendo
+2. ✅ Configurar GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET
+3. ✅ Actualizar password de PostgreSQL en ConnectionString
+4. ✅ Ejecutar `dotnet run`
+
+Las variables que ya tienes en Render (GCAL_SCOPES, GCAL_REDIRECT_URI) ahora también están en `appsettings.json` con valores para localhost.
+
+Para más detalles, revisa: **LOCALHOST.md**
