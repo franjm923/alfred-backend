@@ -41,39 +41,123 @@ public class GCalService
             return result;
         }
 
-        // real: calcular según turnos existentes (fallback simple sin freeBusy aún)
-        var now = DateTime.UtcNow.AddMinutes(5);
+        // real: usar FreeBusy API de Google Calendar
+        return await GetAvailableSlotsAsync(medicoId, count, durMin);
+    }
 
-        // Cargar turnos existentes del médico para evitar solapamientos
-        var existentes = await _db.Turnos
-            .Where(t => t.MedicoId == medicoId && t.Estado == EstadoTurno.Confirmado && t.FinUtc > now)
-            .OrderBy(t => t.InicioUtc)
-            .ToListAsync();
+    /// <summary>
+    /// Obtiene slots disponibles usando Google Calendar FreeBusy API
+    /// </summary>
+    public async Task<IReadOnlyList<Slot>> GetAvailableSlotsAsync(Guid medicoId, int count = 3, int durMin = 30, int daysAhead = 7)
+    {
+        var result = new List<Slot>();
+        var dur = TimeSpan.FromMinutes(durMin);
 
-        var cursor = now;
-        while (result.Count < count)
+        // Buscar integración del médico
+        var integ = await _db.Integraciones.FirstOrDefaultAsync(i => i.MedicoId == medicoId && i.Proveedor == "Google");
+        if (integ == null || string.IsNullOrEmpty(integ.RefreshTokenEnc))
         {
-            var local = cursor.ToLocalTime();
-            var inicioDia = new DateTime(local.Year, local.Month, local.Day, 9, 0, 0, DateTimeKind.Local);
-            var finDia    = new DateTime(local.Year, local.Month, local.Day, 18, 0, 0, DateTimeKind.Local);
-            var start = local > inicioDia ? local : inicioDia;
-
-            for (var candidate = start; candidate + dur <= finDia; candidate = candidate.Add(dur))
-            {
-                var cStartUtc = candidate.ToUniversalTime();
-                var cEndUtc   = cStartUtc + dur;
-                var solapa = existentes.Any(t => !(cEndUtc <= t.InicioUtc || cStartUtc >= t.FinUtc));
-                if (!solapa)
-                {
-                    result.Add(new Slot(cStartUtc, cEndUtc));
-                    if (result.Count >= count) break;
-                }
-            }
-
-            cursor = new DateTime(local.Year, local.Month, local.Day, 9, 0, 0, DateTimeKind.Local)
-                        .AddDays(1).ToUniversalTime();
+            _log.LogWarning("No hay integración de Calendar para medico={MedicoId}, usando fallback simulate", medicoId);
+            return await GetSimulatedSlots(count, durMin);
         }
 
+        // Refrescar access token
+        var (accessToken, _) = await _oauth.RefreshAsync(integ.RefreshTokenEnc);
+
+        // Llamar a FreeBusy API
+        var http = _httpFactory.CreateClient();
+        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        http.BaseAddress = new Uri("https://www.googleapis.com/calendar/v3/");
+
+        var timeMin = DateTime.UtcNow;
+        var timeMax = timeMin.AddDays(daysAhead);
+
+        var payload = new
+        {
+            timeMin = timeMin.ToString("o"),
+            timeMax = timeMax.ToString("o"),
+            items = new[] { new { id = "primary" } }
+        };
+
+        var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+        var res = await http.PostAsync("freeBusy", content);
+        var body = await res.Content.ReadAsStringAsync();
+
+        if (!res.IsSuccessStatusCode)
+        {
+            _log.LogWarning("Google Calendar FreeBusy error {Status}: {Body}", res.StatusCode, body);
+            return await GetSimulatedSlots(count, durMin);
+        }
+
+        using var doc = JsonDocument.Parse(body);
+        var calendars = doc.RootElement.GetProperty("calendars");
+        var primary = calendars.GetProperty("primary");
+        var busyPeriods = new List<(DateTime start, DateTime end)>();
+
+        if (primary.TryGetProperty("busy", out var busyArray))
+        {
+            foreach (var busy in busyArray.EnumerateArray())
+            {
+                var start = DateTime.Parse(busy.GetProperty("start").GetString()!);
+                var end = DateTime.Parse(busy.GetProperty("end").GetString()!);
+                busyPeriods.Add((start, end));
+            }
+        }
+
+        // Generar slots disponibles (lunes a viernes, 9am-6pm)
+        var cursor = DateTime.UtcNow.AddMinutes(30);
+        var maxDate = cursor.AddDays(daysAhead);
+
+        while (result.Count < count && cursor < maxDate)
+        {
+            var local = cursor.ToLocalTime();
+            
+            // Saltar fines de semana
+            if (local.DayOfWeek == DayOfWeek.Saturday || local.DayOfWeek == DayOfWeek.Sunday)
+            {
+                cursor = cursor.AddDays(1);
+                continue;
+            }
+
+            // Horario laboral: 9am - 6pm
+            var dayStart = new DateTime(local.Year, local.Month, local.Day, 9, 0, 0, DateTimeKind.Local).ToUniversalTime();
+            var dayEnd = new DateTime(local.Year, local.Month, local.Day, 18, 0, 0, DateTimeKind.Local).ToUniversalTime();
+
+            var slotStart = cursor < dayStart ? dayStart : cursor;
+
+            while (slotStart + dur <= dayEnd && result.Count < count)
+            {
+                var slotEnd = slotStart + dur;
+
+                // Verificar si el slot no solapa con períodos ocupados
+                var isBusy = busyPeriods.Any(b => !(slotEnd <= b.start || slotStart >= b.end));
+
+                if (!isBusy)
+                {
+                    result.Add(new Slot(slotStart, slotEnd));
+                }
+
+                slotStart = slotStart.AddMinutes(durMin);
+            }
+
+            cursor = dayEnd;
+        }
+
+        return result;
+    }
+
+    private async Task<IReadOnlyList<Slot>> GetSimulatedSlots(int count, int durMin)
+    {
+        var result = new List<Slot>();
+        var dur = TimeSpan.FromMinutes(durMin);
+        var start = DateTime.UtcNow.AddMinutes(30);
+        
+        for (int i = 0; i < count; i++)
+        {
+            var s = start.AddMinutes(60 * i);
+            result.Add(new Slot(s, s + dur));
+        }
+        
         return result;
     }
 

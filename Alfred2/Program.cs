@@ -30,12 +30,11 @@ builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogL
 builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.Debug);
 
 // ===== OpenAI HttpClient =====
+// OpenAI es opcional: solo se requiere si FeatureFlags:INTENT_MODE=llm
 var openAiKey =
     Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-    ?? builder.Configuration["OPENAI_API_KEY"];
-
-if (string.IsNullOrWhiteSpace(openAiKey))
-    throw new InvalidOperationException("Falta OPENAI_API_KEY");
+    ?? builder.Configuration["OPENAI_API_KEY"]
+    ?? "sk-placeholder"; // Placeholder si no está configurado (para modo simple)
 
 builder.Services.AddHttpClient<OpenAIChatService>(c =>
 {
@@ -87,8 +86,10 @@ builder.Services.AddAuthentication(o =>
     o.Cookie.Name = "alfred.auth";
     o.Cookie.HttpOnly = true;
     // Para dominios distintos (Vercel + Render): SameSite=None + Secure
-    o.Cookie.SameSite = SameSiteMode.None;
-    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    // Para localhost: SameSite=Lax + sin Secure
+    var isLocalhost = builder.Configuration["PUBLIC_BASE_URL"]?.Contains("localhost") ?? false;
+    o.Cookie.SameSite = isLocalhost ? SameSiteMode.Lax : SameSiteMode.None;
+    o.Cookie.SecurePolicy = isLocalhost ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
     o.ExpireTimeSpan = TimeSpan.FromDays(7);
     o.LoginPath = "/login/google";
 })
@@ -112,7 +113,7 @@ builder.Services.AddAuthentication(o =>
 builder.Services.AddAuthorization();
 
 // ===== Render: puerto dinámico =====
-var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 var app = builder.Build();
@@ -287,9 +288,11 @@ app.MapGet("/api/me", async (ClaimsPrincipal user, [FromServices] AppDbContext d
 
 // ====== Google Calendar OAuth ======
 // Nota: Aquí agregamos skeleton; implementación real de OAuth puede requerir Google SDK.
-app.MapGet("/calendar/connect", ([FromServices] GoogleOAuthService oauth) =>
+app.MapGet("/calendar/connect", (ClaimsPrincipal user, [FromServices] GoogleOAuthService oauth) =>
 {
-    var url = oauth.GetConsentUrl();
+    if (!(user.Identity?.IsAuthenticated ?? false)) return Results.Unauthorized();
+    var email = user.FindFirst("email")?.Value;
+    var url = oauth.GetConsentUrl(email);
     return Results.Redirect(url);
 }).RequireAuthorization();
 
@@ -302,10 +305,12 @@ app.MapGet("/calendar/oauth-callback", async (
     var code = ctx.Request.Query["code"].ToString();
     if (string.IsNullOrEmpty(code)) return Results.BadRequest(new { error = "missing_code" });
 
-    // Usuario logueado
-    if (!(ctx.User.Identity?.IsAuthenticated ?? false)) return Results.Unauthorized();
-    var email = ctx.User.FindFirst("email")?.Value;
-    if (string.IsNullOrEmpty(email)) return Results.Unauthorized();
+    // Leer email del state parameter
+    var state = ctx.Request.Query["state"].ToString();
+    var email = string.IsNullOrEmpty(state) ? null : state;
+    
+    if (string.IsNullOrEmpty(email)) 
+        return Results.BadRequest(new { error = "missing_state", note = "Se requiere el email en el state parameter" });
 
     // Intercambio code -> tokens
     var (accessToken, refreshToken, expiresUtc) = await oauth.ExchangeCodeAsync(code);
@@ -338,8 +343,35 @@ app.MapGet("/calendar/oauth-callback", async (
     }
     await db.SaveChangesAsync();
 
-    return Results.Redirect("/healthz");
+    // Redirigir al frontend
+    var frontendUrl = builder.Configuration["FRONTEND_REDIRECT_URL"] ?? "http://localhost:3000/home";
+    var settingsUrl = frontendUrl.Replace("/home", "/settings");
+    return Results.Redirect(settingsUrl);
 });
+
+// Verificar si el médico tiene Calendar conectado
+app.MapGet("/api/calendar/status", async (ClaimsPrincipal user, [FromServices] AppDbContext db) =>
+{
+    if (!(user.Identity?.IsAuthenticated ?? false)) return Results.Unauthorized();
+    var email = user.FindFirst("email")?.Value;
+    if (string.IsNullOrEmpty(email)) return Results.Unauthorized();
+
+    var medico = await db.Medicos.Include(m => m.Integraciones)
+        .FirstOrDefaultAsync(m => m.Email == email);
+    
+    if (medico == null) return Results.NotFound(new { error = "medico_not_found" });
+
+    var integ = medico.Integraciones.FirstOrDefault(i => i.Proveedor == "Google");
+    var connected = integ != null && !string.IsNullOrEmpty(integ.RefreshTokenEnc);
+
+    return Results.Ok(new
+    {
+        connected,
+        provider = "Google",
+        connectedAt = integ?.CreadoUtc,
+        email = integ != null ? medico.Email : null
+    });
+}).RequireAuthorization();
 
 // ====== Slots para frontend ======
 app.MapGet("/api/slots", async (ClaimsPrincipal user, [FromServices] AppDbContext db, [FromServices] GCalService gcal, int count = 3) =>
