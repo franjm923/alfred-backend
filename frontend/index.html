@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Alfred — Automatización de pedidos y turnos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/landing.css" />
+  <!-- Íconos Lucide (CDN) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div class="alfred">
+
+    <!-- ===== Header ===== -->
+    <header class="site-header">
+      <div class="container nav">
+        <div class="brand">
+          <i class="icon" src="assets/AF32.png"></i>
+          <span>Alfred</span>
+        </div>
+        <a class="btn btn-outline btn-sm" href="https://alfredbot.com.ar/login">Iniciar Sesión</a>
+      </div>
+    </header>
+
+    <!-- ===== Hero ===== -->
+    <section class="hero py-20 px-4">
+      <div class="container text-center">
+        <span class="badge mb-6">🚀 Automatización Inteligente</span>
+        <h1>
+          Automatiza tus pedidos y turnos con <span class="accent">Alfred</span>
+        </h1>
+        <p>
+          El bot inteligente que revoluciona la gestión de tu negocio. Automatiza pedidos, agenda turnos y mejora la
+          experiencia de tus clientes 24/7.
+        </p>
+
+        <div class="btn-row" style="margin-top: 1.25rem;">
+          <button class="btn btn-primary btn-lg" id="btn-agendar">
+            <i data-lucide="calendar"></i>
+            <span>Agendar Llamada</span>
+          </button>
+          <button class="btn btn-outline btn-lg" id="btn-demo">
+            <span>Ver Demo</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Features ===== -->
+    <section class="py-20 px-4">
+      <div class="container">
+        <div class="text-center mb-12">
+          <h2 class="mb-4 title-2">
+            ¿Por qué elegir Alfred?
+          </h2>
+          <p class="muted lead">
+            Descubre cómo Alfred puede transformar la gestión de tu negocio
+          </p>
+        </div>
+
+        <div class="grid cards">
+          <!-- Card 1 -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">
+                <i data-lucide="message-square"></i>
+              </div>
+              <h3>Gestión de Pedidos</h3>
+              <p class="muted">
+                Automatiza la recepción y procesamiento de pedidos a través de WhatsApp, reduciendo errores y
+                mejorando la eficiencia.
+              </p>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">
+                <i data-lucide="calendar"></i>
+              </div>
+              <h3>Agenda de Turnos</h3>
+              <p class="muted">
+                Permite a tus clientes agendar citas automáticamente, sincronizando con tu calendario y enviando
+                recordatorios.
+              </p>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">
+                <i data-lucide="zap"></i>
+              </div>
+              <h3>Disponible 24/7</h3>
+              <p class="muted">
+                Tu asistente virtual nunca duerme. Atiende consultas y procesa solicitudes las 24 horas del día, los 7
+                días de la semana.
+              </p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Video Demo ===== -->
+    <section class="py-20 px-4 section-muted">
+      <div class="container text-center" style="max-width: 960px;">
+        <h2 class="mb-6 title-2">Ve Alfred en acción</h2>
+        <p class="muted mb-12 lead">Descubre cómo Alfred puede transformar tu negocio en solo 2 minutos</p>
+
+        <div class="video-shell">
+          <div class="video-overlay">
+            <button class="play-btn" id="play-demo" aria-label="Reproducir demo">
+              <i data-lucide="play"></i>
+            </button>
+          </div>
+          <div class="video-caption">
+            <p class="mb-0" style="font-weight: 600;">Demo: Automatización de Pedidos con Alfred</p>
+            <small>2:30 min</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Benefits ===== -->
+    <section class="py-20 px-4">
+      <div class="container">
+        <div class="benefits">
+          <div>
+            <h2 class="mb-6 title-2">
+              Resultados que hablan por sí solos
+            </h2>
+
+            <div class="benefit-row">
+              <i class="tick" data-lucide="check-circle"></i>
+              <div>
+                <h3 class="mb-4" style="margin-bottom:.4rem;">Reduce errores en un 90%</h3>
+                <p class="muted">Elimina los errores humanos en la toma de pedidos y agendamiento de citas</p>
+              </div>
+            </div>
+
+            <div class="benefit-row">
+              <i class="tick" data-lucide="check-circle"></i>
+              <div>
+                <h3 class="mb-4" style="margin-bottom:.4rem;">Ahorra hasta 8 horas diarias</h3>
+                <p class="muted">Automatiza tareas repetitivas y libera tiempo para enfocarte en hacer crecer tu negocio</p>
+              </div>
+            </div>
+
+            <div class="benefit-row">
+              <i class="tick" data-lucide="check-circle"></i>
+              <div>
+                <h3 class="mb-4" style="margin-bottom:.4rem;">Mejora la satisfacción del cliente</h3>
+                <p class="muted">Respuestas instantáneas y servicio 24/7 que tus clientes van a adorar</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="benefit-visual">
+              <div class="text-center">
+                <i data-lucide="bot" class="benefit-bot"></i>
+                <p class="muted" style="font-size: 1.05rem;">Alfred trabajando para tu negocio</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta py-20 px-4">
+      <div class="container" style="max-width: 900px;">
+        <h2 class="mb-6 title-2">
+          ¿Listo para automatizar tu negocio?
+        </h2>
+        <p class="mb-8 lead">
+          Agenda una llamada gratuita y descubre cómo Alfred puede transformar tu negocio en 30 días
+        </p>
+
+        <div class="btn-row">
+          <button class="btn btn-lg" style="background:#fff; color:#111;" id="cta-agendar">
+            <i data-lucide="calendar"></i>
+            <span>Agendar Llamada Gratuita</span>
+          </button>
+          <button class="btn btn-outline btn-lg" id="cta-15min" style="border-color: #ffffff55;">
+            <i data-lucide="clock"></i>
+            <span>Solo 15 minutos</span>
+          </button>
+        </div>
+
+        <p class="cta-foot">
+          Sin compromiso • Consulta gratuita • Resultados garantizados
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer py-16 px-4">
+      <div class="container">
+        <div class="footer-top">
+          <div class="brand">
+            <i class="icon" data-lucide="bot"></i>
+            <span class="fw-700">Alfred Bot</span>
+          </div>
+          <nav class="footer-links">
+            <a href="#">Términos</a>
+            <a href="#">Privacidad</a>
+            <a href="#">Contacto</a>
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          © 2024 Alfred Bot. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // Inicializar íconos Lucide una vez cargado el DOM
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.lucide && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    });
+
+    // Handlers de demo (ajusta a tus rutas reales)
+    document.addEventListener('click', (e) => {
+      const id = e.target.closest('button')?.id;
+      if (id === 'btn-agendar' || id === 'cta-agendar') {
+        // Reemplaza con tu link de Calendly / WhatsApp
+        alert('Aquí abrirías tu agenda (Calendly/WhatsApp).');
+      }
+      if (id === 'btn-demo' || id === 'play-demo') {
+        // Reemplaza con el link a tu video (YouTube/Vimeo/archivo)
+        alert('Aquí reproducirías la demo.');
+      }
+      if (id === 'cta-15min') {
+        alert('Llamada de 15 minutos: agenda rápida.');
+      }
+    });
+  </script>
+</body>
+</html>

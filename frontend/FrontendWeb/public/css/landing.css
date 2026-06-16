@@ -1,0 +1,218 @@
+/* Mejoras de posicionamiento para botones principales en hero */
+.hero .btn-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;              /* permite que el botón principal no quede apretado */
+  gap: .75rem 1rem;             /* separación consistente en X/Y */
+}
+
+/* Asegura que Agendar quede primero y con un pequeño respiro cuando se apilen */
+#btn-agendar { order: 0; }
+#btn-demo    { order: 1; }
+
+/* CTA: mismo comportamiento responsive sin cambiar colores */
+.cta .btn-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .75rem 1rem;
+}
+/* Apilado vertical en móviles para un toque más cómodo, sin cambiar colores */
+@media (max-width: 640px){
+  .hero .btn-row,
+  .cta .btn-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  #btn-agendar,
+  #cta-agendar { margin-bottom: .5rem; }
+}
+/* === Alfred Dark Palette === */
+:root {
+  /* Core */
+  --bg: #131313;                /* Background */
+  --surface: #1A1A1A;           /* Cards / nav */
+  --border: #2A2A2A;            /* Lines / dividers */
+  --text: #F5F5F5;              /* Primary text */
+  --muted: #BFBFBF;             /* Secondary text */
+  --disabled: #777777;
+
+  /* Brand */
+  --primary: #EE0000;           /* Alfred Red */
+  --primary-hover: #C70000;
+  --primary-soft: #FF4D4D;
+
+  /* Semantic */
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --info:    #3B82F6;
+  --error:   #EF4444;
+
+  /* Accents / effects */
+  --hero-grad: radial-gradient(80% 80% at 50% 20%, rgba(238,0,0,.25) 0%, rgba(238,0,0,0) 60%);
+  --shell-grad: linear-gradient(135deg, #EE0000 0%, #1A1A1A 60%, #131313 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: dark; }
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+}
+.container { max-width: 1100px; margin: 0 auto; }
+.text-center { text-align: center }
+.muted { color: var(--muted); }
+.lead { font-size: 1.05rem }
+.fw-700 { font-weight: 700 }
+.py-20 { padding-top: 5rem; padding-bottom: 5rem }
+.px-4 { padding-left: 1rem; padding-right: 1rem }
+.mb-0 { margin-bottom: 0 }
+.mb-4 { margin-bottom: 1rem }
+.mb-6 { margin-bottom: 1.5rem }
+.mb-8 { margin-bottom: 2rem }
+.mb-12 { margin-bottom: 3rem }
+
+/* Header */
+.site-header {
+  position: sticky; top: 0;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(26,26,26,.85), rgba(19,19,19,.75)),
+    var(--hero-grad);
+}
+.nav { display: flex; align-items: center; justify-content: space-between; height: 64px }
+.brand { display: inline-flex; align-items: center; gap: .5rem; font-weight: 800; font-size: 1.1rem; color: var(--text); }
+.brand .icon { width: 24px; height: 24px; display: inline-block; background: url('/assets/AF32.png') no-repeat center / cover }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .6rem 1rem; border-radius: .6rem;
+  border: 1px solid var(--border);
+  background: var(--surface); color: var(--text);
+  text-decoration: none; cursor: pointer; font-weight: 600;
+  transition: background .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+}
+.btn:hover { background: #212121; }
+.btn:active { transform: translateY(1px); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary-soft); }
+
+.btn-sm { padding: .45rem .8rem; font-size: .92rem }
+.btn-lg { padding: .85rem 1.25rem }
+
+.btn-primary {
+  background: var(--primary);
+  border-color: transparent;
+  color: #fff;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+
+/* Hero */
+.hero {
+  background:
+    var(--shell-grad),
+    radial-gradient(ellipse at top, rgba(255,255,255,0.02), transparent),
+    radial-gradient(ellipse at bottom, rgba(255,255,255,0.01), transparent);
+}
+.badge {
+  display: inline-block; padding: .35rem .6rem; border-radius: 9999px;
+  background: var(--primary); color: #fff; font-size: .85rem; border: 1px solid transparent;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06) inset;
+}
+.title-2 { font-size: clamp(22px, 3.5vw, 32px); font-weight: 800 }
+.accent { color: var(--primary-soft) }
+
+/* Cards grid */
+.grid.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem }
+.card {
+  border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; background: var(--surface);
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+.card-content { padding: 1rem; color: var(--text); }
+.feature-icon {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  background: rgba(238,0,0,.12); color: var(--primary);
+  border-radius: 10px; margin-bottom: .75rem;
+}
+
+/* Video shell */
+.section-muted {
+  background: linear-gradient(180deg, #191919, #151515);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.video-shell {
+  height: 320px; border-radius: 16px;
+  border: 1px solid var(--border); background: #0e0e0e;
+  overflow: hidden; position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.video-overlay { position: absolute; inset: 0; display: grid; place-items: center }
+.play-btn {
+  width: 66px; height: 66px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); display: grid; place-items: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.play-btn:hover { border-color: var(--primary); color: var(--primary-soft); }
+.video-caption { position: absolute; left: 12px; bottom: 12px; color: #fff; opacity: .9 }
+
+/* Benefits */
+.benefits { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem }
+.benefit-row { display: flex; gap: .75rem; margin-bottom: 1rem }
+.benefit-row .tick { color: var(--success) }
+.benefit-visual {
+  border: 1px dashed var(--border); border-radius: 14px; height: 100%;
+  display: grid; place-items: center; background: rgba(255,255,255,.01);
+}
+.benefit-bot { width: 80px; height: 80px; color: var(--text) }
+
+/* CTA */
+.cta {
+  background: linear-gradient(135deg, #1A1A1A, #0f0f0f);
+  color: var(--text); text-align: center;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  box-shadow: inset 0 0 120px rgba(238,0,0,.1);
+}
+.cta .btn-outline { color: var(--text); border-color: var(--border); }
+.cta .btn-outline:hover { color: var(--primary-soft); border-color: var(--primary); }
+.cta-foot { color: var(--muted); margin-top: 1rem }
+
+/* Footer */
+.site-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+}
+.footer-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .75rem }
+.footer-links { display: flex; gap: .75rem }
+.footer-links a { color: inherit; opacity: .9; text-decoration: none }
+.footer-links a:hover { color: var(--primary-soft); opacity: 1; }
+.footer-bottom { opacity: .75; font-size: .9rem }
+
+/* Utilities for states */
+.tag-success { color: var(--success) }
+.tag-warning { color: var(--warning) }
+.tag-info    { color: var(--info) }
+.tag-error   { color: var(--error) }
+
+/* Responsive */
+@media (max-width: 860px){
+  .benefits { grid-template-columns: 1fr; }
+}

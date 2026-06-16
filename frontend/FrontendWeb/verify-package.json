@@ -1,0 +1,7 @@
+{
+  "name": "verify-routes",
+  "version": "1.0.0",
+  "scripts": {
+    "check": "echo 'Verificando rutas...' && node verify.js"
+  }
+}

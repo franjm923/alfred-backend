@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light (fallback) */
+:root {
+  --background: #ffffff;
+  --foreground: #0b0c10;
+
+  --card: #ffffff;
+  --card-foreground: #0b0c10;
+
+  --popover: #ffffff;
+  --popover-foreground: #0b0c10;
+
+  /* Alfred brand */
+  --primary: #EE0000;                /* rojo Alfred */
+  --primary-foreground: #ffffff;
+
+  --secondary: #f4f4f4;
+  --secondary-foreground: #0b0c10;
+
+  --muted: #f4f4f4;
+  --muted-foreground: #6b7280;
+
+  --accent: #3B82F6;
+  --accent-foreground: #0b0c10;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #EE0000;
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --info:    #3B82F6;
+  --disabled:#777777;
+
+  --radius: 12px;
+}
+
+/* Dark (predeterminado) */
+.dark {
+  --background: #131313;
+  --foreground: #F5F5F5;
+
+  --card: #1A1A1A;
+  --card-foreground: #F5F5F5;
+
+  --popover: #1A1A1A;
+  --popover-foreground: #F5F5F5;
+
+  --primary: #EE0000;                /* rojo Alfred */
+  --primary-foreground: #ffffff;
+
+  --secondary: #1A1A1A;
+  --secondary-foreground: #F5F5F5;
+
+  --muted: #1A1A1A;
+  --muted-foreground: #BFBFBF;
+
+  --accent: #3B82F6;
+  --accent-foreground: #131313;
+
+  --destructive: #EF4444;
+  --destructive-foreground: #131313;
+
+  --border: #2A2A2A;
+  --input: #2A2A2A;
+  --ring: #EE0000;
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --info:    #3B82F6;
+  --disabled:#777777;
+
+  --radius: 12px;
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+/* Helpers de gradiente (por si los usás después) */
+.hero-gradient { background: linear-gradient(135deg, #EE0000 0%, #1A1A1A 60%, #131313 100%); }
+.cta-glow { background: radial-gradient(80% 80% at 50% 20%, rgba(238,0,0,.25) 0%, rgba(238,0,0,0) 60%); }

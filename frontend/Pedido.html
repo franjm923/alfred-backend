@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Historial de Pedidos</title>
+  <link rel="stylesheet" href="css/Pedido.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <nav class="navbar" role="navigation">
+    <div class="navbar-logo">
+      <img src="assets/AF32.png" alt="Logo Alfred" height="36" />
+    </div>
+    <ul class="navbar-links">
+      <li><a href="Home.html">Home</a></li>
+      <li><a href="Perfil.html">Perfil</a></li>
+      <li><a href="Pedido.html" class="active">Pedidos</a></li>
+      <li><a href="index.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main class="pedidos-container">
+    <h1>Historial de Pedidos Entregados</h1>
+    <div class="tabla-container">
+      <table class="tabla-pedidos">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Dirección</th>
+            <th>Medio de Pago</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="pedidos-body">
+          <!-- Filas se cargan desde JS -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="js/Pedido.js"></script>
+</body>
+</html>

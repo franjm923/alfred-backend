@@ -1,0 +1,158 @@
+body {
+  background: #ee0000;
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.overlay{
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1;
+}
+.login-header {
+  
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  color: white;
+  font-family: 'The Seasons'; /* Fuente que mencionaste */
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;       /* espacio pequeño entre logo y texto */
+  padding: 0;
+  margin: 0;
+}
+
+.logo {
+  width: 60px; /* Ajusta el tamaño del logo */
+  height: auto;
+  margin: 0;
+  display: block;
+  margin-right: 4px;
+}
+.logo-text {
+  font-family: 'The Seasons';
+  font-size: 2.0rem;
+  font-weight: normal;
+  user-select: none;
+}
+.registro-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('../assets/BG.jpg') no-repeat center center/cover;
+  border: 4px solid #EE0000; /* color y grosor del borde */
+  box-sizing: border-box;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.registro-form {
+  background: #181818;
+  border-radius: 22px;
+  box-shadow: 0 4px 22px rgba(0,0,0,0.20);
+  padding: 36px 38px 30px 38px;
+  width: 100%;
+  z-index: 2; /* encima del overlay */
+  max-width: 540px;
+  color: #fff;
+}
+
+h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.2em;
+  font-weight: 700;
+}
+
+.subtitulo {
+  margin-bottom: 20px;
+  color: #ddd;
+  font-size: 1.06em;
+}
+
+.registro-row {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 0;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 2px;
+  color: #fff;
+}
+
+.form-group input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  font-size: 1em;
+  background: #fff;
+  color: #181818;
+  transition: border-color 0.18s;
+}
+
+.form-group input:focus {
+  border-color: #ee0000;
+  outline: none;
+}
+
+.w-100 {
+  min-width: 0;
+}
+
+.registro-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 0 18px 0;
+  font-size: 0.97em;
+  color: #fff;
+}
+.registro-checkbox a {
+  color: #ee0000;
+  text-decoration: none;
+}
+
+.btn-registro {
+  width: 100%;
+  padding: 15px 0;
+  background: #ee0000;
+  color: #fff;
+  font-size: 1.18em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background 0.16s;
+  font-weight: bold;
+}
+.btn-registro:hover {
+  background: #b80000;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .registro-form { padding: 18px 6px; }
+  .registro-row { flex-direction: column; gap: 7px; }
+}

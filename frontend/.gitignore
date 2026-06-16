@@ -1,0 +1,34 @@
+# Node / Next
+node_modules/
+.next/
+out/
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+.turbo/
+.pnpm-store/
+
+# Vercel / Deploy
+.vercel/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env (nunca subas secretos)
+.env*
+!.env.example
+
+# SO / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+FrontendWeb/node_modules/
+FrontendWeb/.next/
+FrontendWeb/out/
+FrontendWeb/dist/
+FrontendWeb/.vercel/
+.env*

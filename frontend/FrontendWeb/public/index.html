@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alfred — Turnos médicos con IA por WhatsApp</title>
+  <meta name="description" content="Alfred agenda turnos por WhatsApp con IA, sincroniza con Google Calendar y te muestra los próximos turnos en la web. Pensado para médicos." />
+  <link rel="icon" href="/assets/AF32.png" />
+  <!-- Usa el CSS que ya definiste con la paleta Alfred -->
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container px-4">
+      <div class="nav">
+        <a class="brand" href="/">
+          <span class="icon" aria-hidden="true"></span>
+          <span>Alfred</span>
+        </a>
+        <nav class="footer-links">
+          <a href="#producto">Producto</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#precios">Precios</a>
+          <a href="/login" class="btn btn-sm btn-outline">Ingresar</a>
+          <!-- TODO: reemplazar por tu Calendly o link a WhatsApp -->
+          <a href="https://wa.me/5491161616321?text=Hola%20quiero%20probar%20Alfred%20para%20mi%20consultorio"
+             class="btn btn-sm btn-primary">Agendar llamada</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero py-20">
+      <div class="container px-4 text-center">
+        <span class="badge mb-6">Hecho para médicos</span>
+        <h1 class="title-2 mb-4">
+          Agenda turnos por <span class="accent">WhatsApp con IA</span>.<br/>
+          Todo queda en tu <span class="accent">Google Calendar</span>.
+        </h1>
+        <p class="lead muted mb-8">
+          Alfred atiende a tus pacientes 24/7 por WhatsApp, confirma turnos,
+          pide los datos faltantes y sincroniza con tu calendario.
+        </p>
+
+        <div class="btn-row mb-12">
+          <!-- TODO: reemplazar por tu WhatsApp (demo/comercial) -->
+          <a id="btn-agendar" class="btn btn-primary btn-lg"
+             href="https://wa.me/5491161616321?text=Hola%20quiero%20ver%20una%20demo%20de%20Alfred">
+            Probar por WhatsApp
+          </a>
+          <!-- TODO: reemplazar por tu Calendly o form -->
+          <a id="btn-demo" class="btn btn-outline btn-lg"
+             href="https://calendly.com/franjm923/alfred-demo">
+            Agendar una llamada
+          </a>
+        </div>
+
+        <!-- Mini trust o copy secundario -->
+        <p class="muted mb-0">Sin instalación. En minutos estás tomando turnos.</p>
+      </div>
+    </section>
+
+    <!-- Features (cards) -->
+    <section id="producto" class="py-20">
+      <div class="container px-4">
+        <div class="grid cards">
+          <!-- IA en WhatsApp -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">🤖</div>
+              <h3 class="fw-700 mb-4">Agente de WhatsApp inteligente</h3>
+              <p class="muted mb-0">
+                Entiende mensajes desordenados, pide datos faltantes (nombre, teléfono, fecha),
+                confirma y registra el turno. Tono y reglas personalizadas por médico.
+              </p>
+            </div>
+          </article>
+
+          <!-- Google Calendar -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">📅</div>
+              <h3 class="fw-700 mb-4">Sincronizado con Google Calendar</h3>
+              <p class="muted mb-0">
+                Cada turno confirmado se crea en tu Google Calendar con los datos del paciente.
+                Evitá solapamientos y recordá todo.
+              </p>
+            </div>
+          </article>
+
+          <!-- Vista Web de turnos -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">👀</div>
+              <h3 class="fw-700 mb-4">Vista web de próximos turnos</h3>
+              <p class="muted mb-0">
+                Desde la app web ves el calendario semanal y el detalle del día:
+                pacientes pendientes, confirmados y sus datos básicos.
+              </p>
+            </div>
+          </article>
+
+          <!-- Excel pacientes -->
+          <article class="card">
+            <div class="card-content">
+              <div class="feature-icon">⬇️</div>
+              <h3 class="fw-700 mb-4">Exportar datos a Excel</h3>
+              <p class="muted mb-6">
+                Descargá la planilla de pacientes (nombre y teléfono) con un clic.
+              </p>
+              <!-- TODO: subí tu plantilla a /assets/template-pacientes.xlsx -->
+              <a class="btn btn-outline btn-sm" href="/assets/template-pacientes.xlsx" download>
+                Descargar plantilla
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cómo funciona (preview / video) -->
+    <section id="como-funciona" class="section-muted py-20">
+      <div class="container px-4">
+        <div class="grid cards">
+          <article class="card">
+            <div class="card-content">
+              <h3 class="fw-700 mb-6">Cómo funciona</h3>
+              <div class="benefit-row">
+                <span class="tick">✔</span>
+                <div>
+                  <strong>1) Conectamos tu número de WhatsApp</strong><br/>
+                  Alfred atiende en tu línea o en una dedicada.
+                </div>
+              </div>
+              <div class="benefit-row">
+                <span class="tick">✔</span>
+                <div>
+                  <strong>2) Personalizamos tu perfil</strong><br/>
+                  Especialidad, horarios, zona, formas de pago y políticas.
+                </div>
+              </div>
+              <div class="benefit-row">
+                <span class="tick">✔</span>
+                <div>
+                  <strong>3) Sincronizamos Google Calendar</strong><br/>
+                  Confirmás turnos y se crean eventos con los datos del paciente.
+                </div>
+              </div>
+              <div class="benefit-row">
+                <span class="tick">✔</span>
+                <div>
+                  <strong>4) Mirá todo en la app web</strong><br/>
+                  Calendario semanal y lista de turnos del día.
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="card">
+            <div class="card-content">
+              <div class="video-shell">
+                <!-- Reemplazá la imagen del preview si querés -->
+                <div class="video-overlay">
+                  <!-- TODO: si tenés un video, cambialo por un <a> que abre tu demo -->
+                  <button class="play-btn" aria-label="Ver demo">▶</button>
+                </div>
+                <div class="video-caption">Vista previa de la app web</div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Beneficios clínicos -->
+    <section class="py-20">
+      <div class="container px-4 benefits">
+        <div>
+          <h3 class="fw-700 mb-6">Beneficios para tu consultorio</h3>
+          <div class="benefit-row">
+            <span class="tick">✔</span>
+            <div>
+              <strong>Menos ausencias</strong><br/>
+              Confirmaciones y recordatorios automáticos por WhatsApp.
+            </div>
+          </div>
+          <div class="benefit-row">
+            <span class="tick">✔</span>
+            <div>
+              <strong>Tiempo clínico de valor</strong><br/>
+              Delegá la coordinación; enfocáte en tus pacientes.
+            </div>
+          </div>
+          <div class="benefit-row">
+            <span class="tick">✔</span>
+            <div>
+              <strong>Sin planillas manuales</strong><br/>
+              Todo queda registrado y exportable a Excel.
+            </div>
+          </div>
+        </div>
+        <div class="benefit-visual">
+          <!-- Podés poner un mockup / captura -->
+          <svg class="benefit-bot" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" opacity=".4"/>
+            <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+            <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+            <path d="M8 15c1.2 1 2.6 1.5 4 1.5s2.8-.5 4-1.5" stroke="currentColor" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA final -->
+    <section class="cta py-20" id="precios">
+      <div class="container px-4">
+        <h3 class="fw-700 mb-6">¿Listo para empezar?</h3>
+        <p class="muted mb-8">Te ayudamos a implementar Alfred en tu consultorio en minutos.</p>
+        <div class="btn-row">
+          <!-- TODO: WhatsApp comercial -->
+          <a id="cta-agendar" class="btn btn-primary btn-lg"
+             href="https://wa.me/5491161616321?text=Quiero%20agendar%20una%20llamada%20por%20Alfred">
+            Hablar por WhatsApp
+          </a>
+          <!-- TODO: Calendly -->
+          <a class="btn btn-outline btn-lg" href="https://calendly.com/franjm923/alfred-demo">
+            Agendar una llamada
+          </a>
+        </div>
+        <div class="cta-foot">¿Ya tenés cuenta? <a href="/login">Ingresá acá</a>.</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer py-20">
+    <div class="container px-4">
+      <div class="footer-top">
+        <a class="brand" href="/">
+          <span class="icon" aria-hidden="true"></span>
+          <span>Alfred</span>
+        </a>
+        <div class="footer-links">
+          <a href="#producto">Producto</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#precios">Precios</a>
+          <a href="/login">Ingresar</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © <span id="year"></span> Alfred — Turnos médicos con IA
+      </div>
+    </div>
+    <script>
+      // año dinámico menor JS posible
+      document.getElementById('year').textContent = new Date().getFullYear();
+      
+      // Asegurar navegación correcta a rutas de Next.js
+      document.addEventListener('DOMContentLoaded', function() {
+        const loginLinks = document.querySelectorAll('a[href="/login"]');
+        loginLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/login';
+          });
+        });
+      });
+    </script>
+  </footer>
+</body>
+</html>
