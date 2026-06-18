@@ -56,6 +56,7 @@ builder.Services.AddScoped<IntentService>();
 builder.Services.AddScoped<GCalService>();
 builder.Services.AddScoped<GoogleOAuthService>();
 builder.Services.AddScoped<WhatsAppConversationService>();
+builder.Services.AddScoped<AdminMedicoService>();
 
 // Cifrado de tokens de calendario (DataProtection)
 builder.Services.AddDataProtection();
@@ -171,6 +172,18 @@ app.MapGet("/logout", async (HttpContext ctx) =>
 app.MapGet("/api/admin/users", [Authorize(Roles = Roles.Admin)] async (AppDbContext db) =>
 {
     return await db.Users.ToListAsync();
+});
+
+// Admin: registrar/actualizar un médico de prueba (Id + número) para el caso de prueba
+app.MapPost("/api/admin/medicos", [Authorize(Roles = Roles.Admin)] async (
+    RegistrarMedicoPruebaRequest req,
+    [FromServices] AdminMedicoService admin) =>
+{
+    if (string.IsNullOrWhiteSpace(req.Numero))
+        return Results.BadRequest(new { error = "numero_requerido" });
+
+    var medico = await admin.RegistrarMedicoDePruebaAsync(req);
+    return Results.Ok(new { medico.Id, medico.NombreCompleto, medico.TelefonoE164 });
 });
 //Cuando devuelvas datos, asegurate de filtrar por MedicoId salvo que el rol sea admin.
 app.MapGet("/api/turnos", async (ClaimsPrincipal user, [FromServices] AppDbContext db) =>

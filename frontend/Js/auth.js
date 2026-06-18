@@ -30,6 +30,18 @@ Alfred.apiGet = async function (path) {
   return res.json();
 };
 
+// POST autenticado al backend con cuerpo JSON.
+Alfred.apiPost = async function (path, body) {
+  const res = await fetch(`${Alfred.API_BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`POST ${path} → ${res.status}`);
+  return res.json();
+};
+
 // Devuelve los datos del usuario logueado, o null si no hay sesión.
 Alfred.obtenerUsuario = async function () {
   const res = await fetch(`${Alfred.API_BASE}/api/me`, { credentials: "include" });

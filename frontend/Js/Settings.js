@@ -65,10 +65,41 @@ async function cargarEstadoCalendar() {
   }
 }
 
+// Panel de admin: solo visible para rol "admin". Registra un médico de prueba.
+function configurarPanelAdmin(usuario) {
+  if (usuario.role !== "admin") return;
+
+  const card = document.getElementById("admin-card");
+  if (card) card.style.display = "";
+
+  const form = document.getElementById("admin-medico-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const resultado = document.getElementById("admin-medico-result");
+    const idRaw = document.getElementById("admin-medico-id").value.trim();
+    const body = {
+      medicoId: idRaw || null,
+      numero: document.getElementById("admin-medico-numero").value.trim(),
+      nombreCompleto: document.getElementById("admin-medico-nombre").value.trim() || null,
+    };
+    try {
+      const medico = await Alfred.apiPost("/api/admin/medicos", body);
+      resultado.textContent =
+        `✅ Médico de prueba listo: ${medico.nombreCompleto} (Id ${medico.id}, número ${medico.telefonoE164})`;
+    } catch (err) {
+      console.error("No se pudo guardar el médico de prueba", err);
+      resultado.textContent = "⚠️ No se pudo guardar el médico de prueba.";
+    }
+  });
+}
+
 async function iniciar() {
   const usuario = await Alfred.requerirSesion();
   if (!usuario) return; // requerirSesion ya redirigió al login
   pintarUsuario(usuario);
+  configurarPanelAdmin(usuario);
   await cargarEstadoCalendar();
 }
 

@@ -59,6 +59,25 @@
                         </p>
                     </div>
                 </section>
+
+                <!-- Panel de administrador (solo rol admin) -->
+                <section class="card" id="admin-card" style="display:none;">
+                    <div class="card-header">
+                        <h2 class="card-title">🛠️ Admin — médico de prueba</h2>
+                    </div>
+                    <div class="card-content">
+                        <p style="color: var(--muted, #6b7280); margin-bottom: 12px;">
+                            Registrá/actualizá un médico de prueba (Id opcional + número) para operar como él.
+                        </p>
+                        <form id="admin-medico-form" style="display:grid; gap:8px; max-width:420px;">
+                            <input id="admin-medico-id" placeholder="Médico Id (GUID, opcional)" />
+                            <input id="admin-medico-numero" placeholder="Número (ej. 5491100000000)" required />
+                            <input id="admin-medico-nombre" placeholder="Nombre (opcional)" />
+                            <button type="submit" class="btn btn-primary">Guardar médico de prueba</button>
+                        </form>
+                        <div id="admin-medico-result" style="margin-top:12px; font-size:0.9em;"></div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
