@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Security.Claims;
 using Alfred2.Services;
+using Alfred2.Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 
@@ -57,6 +58,7 @@ builder.Services.AddScoped<GCalService>();
 builder.Services.AddScoped<GoogleOAuthService>();
 builder.Services.AddScoped<WhatsAppConversationService>();
 builder.Services.AddScoped<AdminMedicoService>();
+builder.Services.AddScoped<MedicoPerfilService>();
 builder.Services.AddScoped<Microsoft.AspNetCore.Authentication.IClaimsTransformation, RoleClaimsTransformation>();
 
 // Cifrado de tokens de calendario (DataProtection)
@@ -186,6 +188,69 @@ app.MapPost("/api/admin/medicos", [Authorize(Roles = Roles.Admin)] async (
     var medico = await admin.RegistrarMedicoDePruebaAsync(req);
     return Results.Ok(new { medico.Id, medico.NombreCompleto, medico.TelefonoE164 });
 });
+
+// ===== Médico: perfil + verificación de matrícula =====
+
+app.MapPut("/api/medico/perfil", async (
+    ActualizarPerfilDto dto,
+    ClaimsPrincipal user,
+    [FromServices] MedicoPerfilService perfil) =>
+{
+    var email = user.FindFirst("email")?.Value;
+    if (string.IsNullOrEmpty(email)) return Results.Unauthorized();
+
+    var medico = await perfil.GuardarPerfilAsync(new GuardarPerfilRequest(email, dto.Especialidad, dto.Matricula));
+    return Results.Ok(new { medico.Especialidad, medico.Matricula, EstadoVerificacion = medico.EstadoVerificacion.ToString() });
+}).RequireAuthorization();
+
+app.MapPost("/api/medico/verificacion", async (
+    ClaimsPrincipal user,
+    [FromServices] MedicoPerfilService perfil) =>
+{
+    var email = user.FindFirst("email")?.Value;
+    if (string.IsNullOrEmpty(email)) return Results.Unauthorized();
+
+    try
+    {
+        var medico = await perfil.EnviarAVerificacionAsync(email);
+        return Results.Ok(new { EstadoVerificacion = medico.EstadoVerificacion.ToString() });
+    }
+    catch (PerfilIncompletoException ex)
+    {
+        return Results.BadRequest(new { error = "perfil_incompleto", message = ex.Message });
+    }
+}).RequireAuthorization();
+
+// ===== Admin: aprobar/rechazar verificaciones =====
+
+app.MapGet("/api/admin/verificaciones/pendientes", [Authorize(Roles = Roles.Admin)] async (
+    [FromServices] AdminMedicoService admin) =>
+{
+    var pendientes = await admin.ListarPendientesAsync();
+    return Results.Ok(pendientes.Select(m => new { m.Id, m.NombreCompleto, m.Email, m.Especialidad, m.Matricula }));
+});
+
+app.MapPost("/api/admin/medicos/{id:guid}/aprobar", [Authorize(Roles = Roles.Admin)] async (
+    Guid id, [FromServices] AdminMedicoService admin) =>
+{
+    try
+    {
+        var medico = await admin.AprobarAsync(id);
+        return Results.Ok(new { medico.Id, EstadoVerificacion = medico.EstadoVerificacion.ToString() });
+    }
+    catch (MedicoNoEncontradoException) { return Results.NotFound(new { error = "medico_not_found" }); }
+});
+
+app.MapPost("/api/admin/medicos/{id:guid}/rechazar", [Authorize(Roles = Roles.Admin)] async (
+    Guid id, [FromServices] AdminMedicoService admin) =>
+{
+    try
+    {
+        var medico = await admin.RechazarAsync(id);
+        return Results.Ok(new { medico.Id, EstadoVerificacion = medico.EstadoVerificacion.ToString() });
+    }
+    catch (MedicoNoEncontradoException) { return Results.NotFound(new { error = "medico_not_found" }); }
+});
 //Cuando devuelvas datos, asegurate de filtrar por MedicoId salvo que el rol sea admin.
 app.MapGet("/api/turnos", async (ClaimsPrincipal user, [FromServices] AppDbContext db) =>
 {
@@ -299,7 +364,8 @@ app.MapGet("/api/me", async (ClaimsPrincipal user, [FromServices] AppDbContext d
             u.Medico.Id,
             u.Medico.NombreCompleto,
             u.Medico.Especialidad,
-            u.Medico.Matricula
+            u.Medico.Matricula,
+            EstadoVerificacion = u.Medico.EstadoVerificacion.ToString()
         }
     });
 })

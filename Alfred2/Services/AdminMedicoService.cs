@@ -1,4 +1,5 @@
 using Alfred2.DBContext;
+using Alfred2.Domain.Exceptions;
 using Alfred2.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,28 @@ public class AdminMedicoService
                 medico.NombreCompleto = req.NombreCompleto;
         }
 
+        await _db.SaveChangesAsync();
+        return medico;
+    }
+
+    // ----- Verificación de matrícula -----
+
+    public Task<List<Medico>> ListarPendientesAsync()
+        => _db.Medicos
+            .Where(m => m.EstadoVerificacion == EstadoVerificacion.Pendiente)
+            .ToListAsync();
+
+    public Task<Medico> AprobarAsync(Guid medicoId)
+        => CambiarEstadoAsync(medicoId, EstadoVerificacion.Autorizado);
+
+    public Task<Medico> RechazarAsync(Guid medicoId)
+        => CambiarEstadoAsync(medicoId, EstadoVerificacion.Rechazado);
+
+    private async Task<Medico> CambiarEstadoAsync(Guid medicoId, EstadoVerificacion estado)
+    {
+        var medico = await _db.Medicos.FirstOrDefaultAsync(m => m.Id == medicoId)
+                     ?? throw new MedicoNoEncontradoException(medicoId);
+        medico.EstadoVerificacion = estado;
         await _db.SaveChangesAsync();
         return medico;
     }

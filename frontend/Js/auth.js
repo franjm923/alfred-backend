@@ -36,9 +36,21 @@ Alfred.apiPost = async function (path, body) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify(body),
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`POST ${path} → ${res.status}`);
+  return res.json();
+};
+
+// PUT autenticado al backend con cuerpo JSON.
+Alfred.apiPut = async function (path, body) {
+  const res = await fetch(`${Alfred.API_BASE}${path}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`PUT ${path} → ${res.status}`);
   return res.json();
 };
 

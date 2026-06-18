@@ -18,6 +18,8 @@ public enum CanalConversacion { WhatsApp = 0 }
 public enum DireccionMensaje { Entrante = 0, Saliente = 1 }
 
 public enum EstadoSync { Nunca = 0, Ok = 1, Error = 2 }
+
+public enum EstadoVerificacion { Borrador = 0, Pendiente = 1, Autorizado = 2, Rechazado = 3 }
 #endregion
 
 #region Base
@@ -47,6 +49,9 @@ public class Medico : EntidadBase
     [Required, MaxLength(140)] public string NombreCompleto { get; set; } = string.Empty;
     [MaxLength(80)] public string? Especialidad { get; set; }
     [MaxLength(40)] public string? Matricula { get; set; }
+
+    /// <summary>Estado de verificación de la matrícula del médico.</summary>
+    public EstadoVerificacion EstadoVerificacion { get; set; } = EstadoVerificacion.Borrador;
 
     [Required, MaxLength(160)] public string Email { get; set; } = string.Empty;
     [MaxLength(32)] public string? TelefonoE164 { get; set; } // +54911...

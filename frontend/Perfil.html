@@ -32,26 +32,31 @@
 
             <section class="card">
                 <div class="card-content">
-                    <dl style="display:grid; grid-template-columns: max-content 1fr; gap:12px 24px; margin:0;">
+                    <dl style="display:grid; grid-template-columns: max-content 1fr; gap:12px 24px; margin:0 0 16px;">
                         <dt style="color: var(--muted, #6b7280);">Nombre</dt>
                         <dd id="campo-nombre" style="margin:0;">—</dd>
 
                         <dt style="color: var(--muted, #6b7280);">Email</dt>
                         <dd id="campo-email" style="margin:0;">—</dd>
 
-                        <dt style="color: var(--muted, #6b7280);">Especialidad</dt>
-                        <dd id="campo-especialidad" style="margin:0;">—</dd>
-
-                        <dt style="color: var(--muted, #6b7280);">Matrícula</dt>
-                        <dd id="campo-matricula" style="margin:0;">—</dd>
-
-                        <dt style="color: var(--muted, #6b7280);">Rol</dt>
-                        <dd id="campo-rol" style="margin:0;">—</dd>
+                        <dt style="color: var(--muted, #6b7280);">Estado</dt>
+                        <dd id="campo-estado" style="margin:0;">—</dd>
                     </dl>
 
-                    <p style="color: var(--muted, #6b7280); font-size:0.85em; margin-top:20px;">
-                        * La edición de estos datos todavía no está disponible (falta el endpoint en el backend).
+                    <form id="perfil-form" style="display:grid; gap:8px; max-width:420px;">
+                        <input id="input-especialidad" placeholder="Especialidad (ej. Clínica médica)" />
+                        <input id="input-matricula" placeholder="Nro de matrícula (ej. MN 12345)" />
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button type="submit" class="btn btn-secondary">Guardar perfil</button>
+                            <button type="button" id="btn-enviar-verificacion" class="btn btn-primary">Enviar para verificación</button>
+                        </div>
+                    </form>
+
+                    <p style="margin-top:12px;">
+                        <a href="Settings.html">⚙️ Conectar Google Calendar (en Configuración)</a>
                     </p>
+
+                    <div id="perfil-result" style="margin-top:12px; font-size:0.95em;"></div>
                 </div>
             </section>
         </main>

@@ -6,6 +6,15 @@ Registro de lo que se va haciendo. Lo más reciente arriba.
 
 ## 2026-06-18
 
+### Fase 2 — Verificación de matrícula
+- **Modelo**: `EstadoVerificacion` (Borrador/Pendiente/Autorizado/Rechazado) en `Medico`.
+- **⚠️ Reset de migraciones**: el historial era todo del esquema e-commerce viejo (no había migración para el esquema médico). Se borraron las migraciones viejas y se generó un `InitialCreate` limpio desde el modelo médico. **Pendiente: resetear la DB de Render** (dropear tablas) antes del próximo deploy — no hay datos reales.
+- **Backend (TDD)**: `MedicoPerfilService` (guardar perfil, enviar a verificación con validación) + `AdminMedicoService` (listar pendientes, aprobar, rechazar) → **12 tests verdes**.
+- **Endpoints**: `PUT /api/medico/perfil`, `POST /api/medico/verificacion`, `GET /api/admin/verificaciones/pendientes`, `POST /api/admin/medicos/{id}/aprobar|rechazar`; `/api/me` ahora devuelve `EstadoVerificacion`.
+- **Frontend**: Perfil editable (especialidad + matrícula) con "Enviar para verificación" → mensaje *"Se ha enviado su información, espere a que sea aceptado"*; panel admin lista pendientes con Aprobar/Rechazar. Helpers `Alfred.apiPut`/`apiPost`.
+- Decisiones: horarios = solo Google Calendar (FreeBusy); aprobación manual del admin.
+- Setup: instalado `dotnet-ef` + `AppDbContextFactory` (design-time) para generar migraciones.
+
 ### Fase 1 — Roles + médico de prueba (admin)
 - **`AdminMedicoService`** ([Alfred2/Services/AdminMedicoService.cs](Alfred2/Services/AdminMedicoService.cs)): upsert de un médico de prueba (Id + número), 2 tests → **7 verdes**.
 - **`POST /api/admin/medicos`** (solo rol `admin`): registra/actualiza el médico de prueba.

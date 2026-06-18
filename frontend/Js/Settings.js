@@ -65,12 +65,62 @@ async function cargarEstadoCalendar() {
   }
 }
 
-// Panel de admin: solo visible para rol "admin". Registra un médico de prueba.
+async function resolverVerificacion(medicoId, accion) {
+  try {
+    await Alfred.apiPost(`/api/admin/medicos/${medicoId}/${accion}`);
+    await cargarPendientes();
+  } catch (e) {
+    console.error("No se pudo resolver la verificación", e);
+  }
+}
+
+function filaPendiente(medico) {
+  const fila = document.createElement("div");
+  fila.style.cssText = "display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border,#e5e7eb);";
+
+  const info = document.createElement("span");
+  info.style.flex = "1";
+  info.textContent = `${medico.nombreCompleto} — ${medico.especialidad || "s/especialidad"} — Mat: ${medico.matricula || "—"} (${medico.email})`;
+
+  const aprobar = document.createElement("button");
+  aprobar.className = "btn btn-primary";
+  aprobar.textContent = "Aprobar";
+  aprobar.onclick = () => resolverVerificacion(medico.id, "aprobar");
+
+  const rechazar = document.createElement("button");
+  rechazar.className = "btn btn-secondary";
+  rechazar.textContent = "Rechazar";
+  rechazar.onclick = () => resolverVerificacion(medico.id, "rechazar");
+
+  fila.append(info, aprobar, rechazar);
+  return fila;
+}
+
+async function cargarPendientes() {
+  const cont = document.getElementById("admin-pendientes");
+  if (!cont) return;
+  try {
+    const pendientes = await Alfred.apiGet("/api/admin/verificaciones/pendientes");
+    if (pendientes.length === 0) {
+      cont.textContent = "No hay verificaciones pendientes.";
+      return;
+    }
+    cont.innerHTML = "";
+    pendientes.forEach((m) => cont.append(filaPendiente(m)));
+  } catch (e) {
+    console.error("No se pudieron cargar las verificaciones pendientes", e);
+    cont.textContent = "No se pudieron cargar las verificaciones.";
+  }
+}
+
+// Panel de admin: solo visible para rol "admin". Registra médico de prueba + verificaciones.
 function configurarPanelAdmin(usuario) {
   if (usuario.role !== "admin") return;
 
   const card = document.getElementById("admin-card");
   if (card) card.style.display = "";
+
+  cargarPendientes();
 
   const form = document.getElementById("admin-medico-form");
   if (!form) return;
