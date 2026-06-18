@@ -6,6 +6,14 @@ Registro de lo que se va haciendo. Lo más reciente arriba.
 
 ## 2026-06-18
 
+### Fase 1 — Roles + médico de prueba (admin)
+- **`AdminMedicoService`** ([Alfred2/Services/AdminMedicoService.cs](Alfred2/Services/AdminMedicoService.cs)): upsert de un médico de prueba (Id + número), 2 tests → **7 verdes**.
+- **`POST /api/admin/medicos`** (solo rol `admin`): registra/actualiza el médico de prueba.
+- **Frontend**: panel admin role-gated en Settings (form Id+número+nombre) + helper `Alfred.apiPost`.
+- **Fix auth**: `RoleClaimsTransformation` mete el rol (desde la BD) en los claims → `[Authorize(Roles=...)]` ahora funciona (antes daba 403 para todos).
+- Commits `ed2f42b`, `64fab3b` (sin pushear).
+- Decisiones: matrícula = aprobación manual del admin; admin entra ingresando médico Id+número a mano.
+
 ### Core de turnos del agente (TDD) + fixes
 - **`AgentTurnoService.CrearTurnoAsync`** (nuevo, [Alfred2/Services/AgentTurnoService.cs](Alfred2/Services/AgentTurnoService.cs)): crea turno, valida médico existente, valida solape de horario, `Origen` configurable (default `Telegram`), duración desde el `Servicio` (fallback a `DuracionMin`).
 - **Proyecto de tests `Alfred2.Tests`** (xUnit + EF InMemory) → **5 tests verdes** (ciclo red-green-refactor).
