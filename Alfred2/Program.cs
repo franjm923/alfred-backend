@@ -57,6 +57,7 @@ builder.Services.AddScoped<GCalService>();
 builder.Services.AddScoped<GoogleOAuthService>();
 builder.Services.AddScoped<WhatsAppConversationService>();
 builder.Services.AddScoped<AdminMedicoService>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authentication.IClaimsTransformation, RoleClaimsTransformation>();
 
 // Cifrado de tokens de calendario (DataProtection)
 builder.Services.AddDataProtection();
