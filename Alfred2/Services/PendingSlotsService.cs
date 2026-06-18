@@ -35,31 +35,3 @@ public class PendingSlotsService
 
     // TODO: background cleanup task para eliminar expirados periódicamente si hiciera falta
 }
-
-public static class TimeFormatting
-{
-    public static string ToArDisplay(DateTime utc)
-    {
-        TimeZoneInfo tz;
-        try
-        {
-            // Linux/macOS (IANA)
-            tz = TimeZoneInfo.FindSystemTimeZoneById("America/Argentina/Buenos_Aires");
-        }
-        catch
-        {
-            try
-            {
-                // Windows (Registry ID)
-                tz = TimeZoneInfo.FindSystemTimeZoneById("Argentina Standard Time");
-            }
-            catch
-            {
-                tz = TimeZoneInfo.Local;
-            }
-        }
-        var normalized = DateTime.SpecifyKind(utc, DateTimeKind.Utc);
-        var local = TimeZoneInfo.ConvertTimeFromUtc(normalized, tz);
-        return local.ToString("ddd dd/MM HH:mm");
-    }
-}

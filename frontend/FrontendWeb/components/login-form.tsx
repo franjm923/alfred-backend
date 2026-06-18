@@ -4,16 +4,14 @@ import { useState } from "react";
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import Label from "@/components/ui/label";
+import { BACKEND_URL } from "@/lib/config";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleGoogleSignIn = () => {
-    // Obtener la URL del backend desde las variables de entorno
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:10000";
-    // Redirigir al endpoint de OAuth de Google en el backend
-    window.location.href = `${backendUrl}/login/google`;
+    window.location.href = `${BACKEND_URL}/login/google`;
   };
 
   return (

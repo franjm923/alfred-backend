@@ -3,26 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Pedidos</title>
+    <title>Turnos - Alfred</title>
     <link rel="stylesheet" href="css/Estilos2.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">A</div>
             </div>
             <nav class="nav">
-                <a href="#" class="nav-link">About Us</a>
-                <a href="#" class="nav-link">Pedidos</a>
-                <a href="#" class="nav-link active">Home</a>
-                <a href="#" class="nav-link">Profile</a>
+                <a href="Home.html" class="nav-link active">Home</a>
+                <a href="Perfil.html" class="nav-link">Perfil</a>
+                <a href="Settings.html" class="nav-link">Configuración</a>
             </nav>
-
-            <!-- Info del usuario -->
             <div class="user-info">
                 <img id="avatar" class="user-avatar" src="assets/default-avatar.png" alt="avatar">
                 <span id="nombreUsuario" class="user-name">Cargando...</span>
@@ -30,111 +25,31 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="dashboard-grid">
-                <!-- Últimos Pedidos -->
                 <section class="card">
                     <div class="card-header">
-                        <h2 class="card-title">
-                            <i data-lucide="clock" class="icon"></i>
-                            Últimos Pedidos
-                        </h2>
+                        <h2 class="card-title">Próximos turnos</h2>
                     </div>
                     <div class="card-content">
-                        <div class="orders-grid" id="recent-orders">
-                            <!-- Aquí se cargarán dinámicamente los pedidos del usuario -->
-                        </div>
+                        <div id="turnos-proximos">Cargando…</div>
                     </div>
                 </section>
 
-                <!-- Historial de Pedidos -->
                 <section class="card">
                     <div class="card-header">
-                        <h2 class="card-title">
-                            <i data-lucide="history" class="icon"></i>
-                            Historial de Pedidos
-                        </h2>
+                        <h2 class="card-title">Historial</h2>
                     </div>
                     <div class="card-content">
-                        <div class="orders-grid" id="order-history">
-                            <!-- Aquí se cargarán dinámicamente los pedidos del usuario -->
-                        </div>
+                        <div id="turnos-historial">Cargando…</div>
                     </div>
                 </section>
             </div>
         </main>
     </div>
 
-    <!-- Modal para Detalles del Envío -->
-    <div id="shipping-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Detalles del Envío</h3>
-                <button class="modal-close" onclick="closeShippingModal()">
-                    <i data-lucide="x" class="icon-sm"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="shipping-cost">Precio de envío:</label>
-                    <div class="input-group">
-                        <span class="input-prefix">$</span>
-                        <input type="number" id="shipping-cost" placeholder="150.00" step="0.01">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="total-cost">Precio total:</label>
-                    <div class="input-group">
-                        <span class="input-prefix">$</span>
-                        <input type="number" id="total-cost" placeholder="1200.00" step="0.01">
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeShippingModal()">Cancelar</button>
-                <button class="btn btn-primary" onclick="confirmShipping()">
-                    <i data-lucide="check" class="icon-sm"></i>
-                    Confirmar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Overlay -->
-    <div id="modal-overlay" class="modal-overlay"></div>
-
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="Js/config.js"></script>
+    <script src="Js/auth.js"></script>
     <script src="Js/Home.js"></script>
-
-    <script>
-      const API = "https://alfred-backend-3ohw.onrender.com"; // Cambiá por tu backend en Render
-
-      async function loadMe(){
-        try {
-          const res = await fetch(`${API}/api/me`, { credentials: "include" });
-          if (!res.ok) {
-            // No está logueado → mandar a login
-            window.location.href = "Login.html";
-            return;
-          }
-          const me = await res.json();
-          document.getElementById("nombreUsuario").textContent = me.name || me.email;
-          if(me.picture){
-            document.getElementById("avatar").src = me.picture;
-          }
-        } catch (e) {
-          console.error("Error al cargar usuario", e);
-          window.location.href = "Login.html";
-        }
-      }
-
-      async function logout(){
-        await fetch(`${API}/logout`, { credentials: "include" });
-        window.location.href = "Login.html";
-      }
-
-      loadMe();
-    </script>
 </body>
 </html>

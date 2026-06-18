@@ -5,3 +5,7 @@ obj/
 *.suo
 .env
 appsettings.Development.json
+
+# Config local de Claude Code y archivos subidos/pegados
+.claude/
+frontend/uploads/

@@ -58,7 +58,6 @@ public class Medico : EntidadBase
 
     public Guid UserId { get; set; } // relación 1–1 con User (opcional)
     public User User { get; set; } = null!;
-    public Guid Id { get; set; }
     public ICollection<Paciente> Pacientes { get; set; } = new List<Paciente>();
     public ICollection<Servicio> Servicios { get; set; } = new List<Servicio>();
     public ICollection<Turno> Turnos { get; set; } = new List<Turno>();
@@ -70,7 +69,6 @@ public class Medico : EntidadBase
 [Index(nameof(Email), IsUnique = true)]
 public class User : EntidadBase
 {
-    public Guid Id { get; set; }
     [Required, MaxLength(160)] public string Email { get; set; } = string.Empty;
 
     // Si usa login clásico

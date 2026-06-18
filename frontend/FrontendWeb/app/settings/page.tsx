@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, CheckCircle2, XCircle } from "lucide-react";
+import { BACKEND_URL } from "@/lib/config";
 
 interface CalendarStatus {
   connected: boolean;
@@ -17,15 +18,13 @@ export default function SettingsPage() {
   const [calendarStatus, setCalendarStatus] = useState<CalendarStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-
   useEffect(() => {
     checkCalendarStatus();
   }, []);
 
   const checkCalendarStatus = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/calendar/status`, {
+      const response = await fetch(`${BACKEND_URL}/api/calendar/status`, {
         credentials: 'include',
       });
 
@@ -41,7 +40,7 @@ export default function SettingsPage() {
   };
 
   const connectCalendar = () => {
-    window.location.href = `${backendUrl}/calendar/connect`;
+    window.location.href = `${BACKEND_URL}/calendar/connect`;
   };
 
   return (

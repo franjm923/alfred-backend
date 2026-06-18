@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { BACKEND_URL } from "@/lib/config";
 
 
 export default function Header() {
@@ -32,8 +33,7 @@ export default function Header() {
               variant="secondary"
               size="sm"
               onClick={async () => {
-                const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-                await fetch(`${backendUrl}/logout`, { credentials: 'include' });
+                await fetch(`${BACKEND_URL}/logout`, { credentials: 'include' });
                 window.location.href = "/login";
               }}
             >

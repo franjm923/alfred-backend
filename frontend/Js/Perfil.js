@@ -1,28 +1,31 @@
-window.onload = () => {
-  document.getElementById('nombre').value = localStorage.getItem('userNombre') || 'Francisco';
-  document.getElementById('apellido').value = localStorage.getItem('userApellido') || 'Juarez';
-  document.getElementById('dni').value = localStorage.getItem('userDNI') || '';
-  document.getElementById('telefono').value = localStorage.getItem('userTelefono') || '';
-};
+// Js/Perfil.js
+// Muestra los datos del médico logueado (solo lectura por ahora).
 
-document.getElementById('perfil-form').onsubmit = function (e) {
-  e.preventDefault();
+function logout() {
+  Alfred.cerrarSesion();
+}
 
-  const dni = document.getElementById('dni').value.trim();
-  const telefono = document.getElementById('telefono').value.trim();
+function pintarUsuario(usuario) {
+  Alfred.setText("nombreUsuario", usuario.name || usuario.email);
+  Alfred.setSrc("avatar", usuario.picture);
+}
 
-  if (!dni.match(/^\d{7,9}$/)) {
-    alert('Por favor, ingresá un DNI válido (7 a 9 números sin puntos ni guiones).');
-    return;
-  }
+function pintarPerfil(usuario) {
+  const medico = usuario.medico;
+  const texto = (valor) => valor || "—";
 
-  if (telefono.length < 6) {
-    alert('Por favor, ingresá un número de teléfono válido.');
-    return;
-  }
+  Alfred.setText("campo-nombre", texto(medico?.nombreCompleto || usuario.name));
+  Alfred.setText("campo-email", texto(usuario.email));
+  Alfred.setText("campo-especialidad", texto(medico?.especialidad));
+  Alfred.setText("campo-matricula", texto(medico?.matricula));
+  Alfred.setText("campo-rol", texto(usuario.role));
+}
 
-  localStorage.setItem('userDNI', dni);
-  localStorage.setItem('userTelefono', telefono);
+async function iniciar() {
+  const usuario = await Alfred.requerirSesion();
+  if (!usuario) return; // requerirSesion ya redirigió al login
+  pintarUsuario(usuario);
+  pintarPerfil(usuario);
+}
 
-  alert('Datos guardados correctamente.');
-};
+iniciar();

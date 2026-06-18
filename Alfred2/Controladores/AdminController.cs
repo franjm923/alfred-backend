@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Alfred2.DBContext;
 using Alfred2.Models;
+using Alfred2.DTOs;
+using Alfred2.Services;
 
 namespace Alfred2.Controladores
 {
@@ -20,7 +22,7 @@ namespace Alfred2.Controladores
             var medico = await _db.Medicos.FirstOrDefaultAsync(m => m.Id == medicoId);
             if (medico == null) return BadRequest("Médico no reconocido.");
 
-            var tz = GetTimeZone(medico.ZonaHorariaIana);
+            var tz = TimeZoneHelper.Get(medico.ZonaHorariaIana);
             var ci = new CultureInfo("es-AR");
 
             var list = await _db.Turnos
@@ -91,23 +93,5 @@ namespace Alfred2.Controladores
             return Ok(new { ok = true });
         }
 
-        private static TimeZoneInfo GetTimeZone(string iana)
-        {
-            try { return TimeZoneInfo.FindSystemTimeZoneById(iana); }
-            catch { return TimeZoneInfo.FindSystemTimeZoneById("America/Argentina/Buenos_Aires"); }
-        }
-    }
-
-    // Podés mover estos DTOs a Alfred2.DTOs si preferís mantenerlos separados.
-    public class ConfirmarTurnoDTO
-    {
-        public decimal? PrecioAcordado { get; set; }
-        public ModalidadTurno? Modalidad { get; set; } // opcional cambiar a virtual/presencial al confirmar
-        public string? Notas { get; set; }
-    }
-
-    public class CancelarTurnoDTO
-    {
-        public string? Motivo { get; set; }
     }
 }

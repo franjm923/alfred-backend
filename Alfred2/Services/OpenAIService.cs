@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Alfred2.DTOs;
 using Alfred2.Models; // ModalidadTurno
+using Alfred2.Services;
 
 namespace Alfred2.OpenAIService
 {
@@ -198,16 +197,6 @@ namespace Alfred2.OpenAIService
 
         private static ExtraccionTurnoDTO PostProcess(ExtraccionTurnoDTO dto, IEnumerable<string> servicios, string? tzId)
         {
-            // Mapear modalidad string -> enum
-            if (dto.Modalidad == null && dto.Copy == null)
-            {
-                // No forzamos si el LLM no lo puso; la app puede default a Presencial
-            }
-
-            // Parse fecha local si viene como string ISO esperado
-            if (dto.LocalInicio == null && dto is { } && TryParseLocalIso(dto, out var local))
-                dto.LocalInicio = local;
-
             // Normalizar servicio por coincidencia con la lista disponible (case-insensitive)
             if (!string.IsNullOrWhiteSpace(dto.Servicio) && servicios.Any())
             {
@@ -221,21 +210,6 @@ namespace Alfred2.OpenAIService
             }
 
             return dto;
-        }
-
-        private static bool TryParseLocalIso(ExtraccionTurnoDTO dto, out DateTime local)
-        {
-            local = default;
-            if (dto.LocalInicio == null) return false;
-
-            // Aceptamos 'yyyy-MM-dd HH:mm' o 'yyyy-MM-ddTHH:mm'
-            var s = dto.LocalInicio?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-            if (dto.LocalInicio.HasValue)
-            {
-                local = dto.LocalInicio.Value;
-                return true;
-            }
-            return false;
         }
 
         private static ExtraccionTurnoDTO HeuristicExtractTurno(
@@ -267,7 +241,7 @@ namespace Alfred2.OpenAIService
             }
 
             // Fecha/hora local (heurística ES-AR)
-            var local = TryParseFechaHoraEsAr(text, tzId) ?? (DateTime?)null;
+            var local = SpanishDateParser.TryParse(text);
 
             var faltan = new List<string>();
             if (local == null) faltan.Add("fecha y hora");
@@ -290,73 +264,6 @@ namespace Alfred2.OpenAIService
                 Faltan = faltan,
                 Copy = copy
             };
-        }
-
-        // --------- Utilidades de parsing ES-AR (texto libre) ---------
-
-        // hoy/mañana, lunes..domingo, dd/MM, HH:mm (am/pm/hs opcional)
-        private static DateTime? TryParseFechaHoraEsAr(string texto, string? tzId)
-        {
-            var now = DateTime.Now;
-            var ci = new CultureInfo("es-AR");
-            texto = texto.ToLowerInvariant();
-
-            DateTime? fecha = null;
-
-            if (texto.Contains("hoy")) fecha = now.Date;
-            else if (texto.Contains("mañana")) fecha = now.Date.AddDays(1);
-            else
-            {
-                string[] dias = { "domingo","lunes","martes","miércoles","miercoles","jueves","viernes","sábado","sabado" };
-                for (int i = 0; i < dias.Length; i++)
-                {
-                    if (texto.Contains(dias[i]))
-                    {
-                        var target = (i == 0 || i == 7) ? DayOfWeek.Sunday :
-                                     (i == 6 || i == 8) ? DayOfWeek.Saturday :
-                                     (DayOfWeek)i;
-                        fecha = NextDayOfWeek(now.Date, target);
-                        break;
-                    }
-                }
-            }
-
-            // dd/MM o dd-MM (opcional año)
-            var mFecha = Regex.Match(texto, @"\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b");
-            if (mFecha.Success)
-            {
-                var d = int.Parse(mFecha.Groups[1].Value);
-                var M = int.Parse(mFecha.Groups[2].Value);
-                var y = mFecha.Groups[3].Success ? int.Parse(mFecha.Groups[3].Value) : now.Year;
-                fecha = new DateTime(y, M, d);
-            }
-
-            // Hora HH:mm o HH.mm o HH hs
-            DateTime? hora = null;
-            var mHora = Regex.Match(texto, @"\b(\d{1,2})[:\.h\s]?(\d{2})?\s*(am|pm|hs)?\b");
-            if (mHora.Success)
-            {
-                int h = int.Parse(mHora.Groups[1].Value);
-                int min = mHora.Groups[2].Success ? int.Parse(mHora.Groups[2].Value) : 0;
-                var suf = mHora.Groups[3].Success ? mHora.Groups[3].Value : null;
-                if (string.Equals(suf, "pm", StringComparison.OrdinalIgnoreCase) && h < 12) h += 12;
-                if (string.Equals(suf, "am", StringComparison.OrdinalIgnoreCase) && h == 12) h = 0;
-                hora = now.Date.AddHours(h).AddMinutes(min);
-            }
-
-            if (fecha.HasValue && hora.HasValue)
-            {
-                return new DateTime(fecha.Value.Year, fecha.Value.Month, fecha.Value.Day,
-                                    hora.Value.Hour, hora.Value.Minute, 0, DateTimeKind.Unspecified);
-            }
-            return null;
-
-            static DateTime NextDayOfWeek(DateTime from, DayOfWeek day)
-            {
-                int diff = ((int)day - (int)from.DayOfWeek + 7) % 7;
-                if (diff == 0) diff = 7;
-                return from.AddDays(diff);
-            }
         }
     }
 }

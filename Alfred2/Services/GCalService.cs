@@ -16,10 +16,11 @@ public class GCalService
     private readonly IHttpClientFactory _httpFactory;
     private readonly GoogleOAuthService _oauth;
     private readonly IConfiguration _cfg;
+    private readonly TokenProtector _tokens;
 
-    public GCalService(AppDbContext db, ILogger<GCalService> log, IHttpClientFactory httpFactory, GoogleOAuthService oauth, IConfiguration cfg)
+    public GCalService(AppDbContext db, ILogger<GCalService> log, IHttpClientFactory httpFactory, GoogleOAuthService oauth, IConfiguration cfg, TokenProtector tokens)
     {
-        _db = db; _log = log; _httpFactory = httpFactory; _oauth = oauth; _cfg = cfg;
+        _db = db; _log = log; _httpFactory = httpFactory; _oauth = oauth; _cfg = cfg; _tokens = tokens;
     }
 
     public async Task<IReadOnlyList<Slot>> GetNextSlotsAsync(Guid medicoId, int count = 3, int durMin = 30)
@@ -55,14 +56,15 @@ public class GCalService
 
         // Buscar integración del médico
         var integ = await _db.Integraciones.FirstOrDefaultAsync(i => i.MedicoId == medicoId && i.Proveedor == "Google");
-        if (integ == null || string.IsNullOrEmpty(integ.RefreshTokenEnc))
+        var refreshToken = _tokens.Unprotect(integ?.RefreshTokenEnc);
+        if (string.IsNullOrEmpty(refreshToken))
         {
-            _log.LogWarning("No hay integración de Calendar para medico={MedicoId}, usando fallback simulate", medicoId);
+            _log.LogWarning("No hay integración válida de Calendar para medico={MedicoId}, usando fallback simulate", medicoId);
             return await GetSimulatedSlots(count, durMin);
         }
 
         // Refrescar access token
-        var (accessToken, _) = await _oauth.RefreshAsync(integ.RefreshTokenEnc);
+        var (accessToken, _) = await _oauth.RefreshAsync(refreshToken);
 
         // Llamar a FreeBusy API
         var http = _httpFactory.CreateClient();
@@ -169,14 +171,15 @@ public class GCalService
 
         // real: Buscar integración guardada (si existiera)
         var integ = await _db.Integraciones.FirstOrDefaultAsync(i => i.MedicoId == medicoId && i.Proveedor == "Google");
-        if (integ == null || string.IsNullOrEmpty(integ.RefreshTokenEnc))
+        var refreshToken = _tokens.Unprotect(integ?.RefreshTokenEnc);
+        if (string.IsNullOrEmpty(refreshToken))
         {
-            _log.LogWarning("CALENDAR_MODE=real pero no hay integración/refresh token; devolviendo simulated");
+            _log.LogWarning("CALENDAR_MODE=real pero no hay integración/refresh token válido; devolviendo simulated");
             return $"simulated-{Guid.NewGuid():N}";
         }
 
         // Refrescar access token si hace falta
-        var (accessToken, _) = await _oauth.RefreshAsync(integ.RefreshTokenEnc);
+        var (accessToken, _) = await _oauth.RefreshAsync(refreshToken);
 
         // Crear evento en el calendario primario
         var http = _httpFactory.CreateClient();

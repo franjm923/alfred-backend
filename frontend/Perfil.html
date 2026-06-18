@@ -1,53 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Perfil de Usuario</title>
-  <link rel="stylesheet" href="css/Perfil.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Alfred</title>
+    <link rel="stylesheet" href="css/Estilos2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar" role="navigation">
-    <div class="navbar-logo">
-      <img src="assets/AF32.png" alt="Logo Alfred" height="36" />
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">A</div>
+            </div>
+            <nav class="nav">
+                <a href="Home.html" class="nav-link">Home</a>
+                <a href="Perfil.html" class="nav-link active">Perfil</a>
+                <a href="Settings.html" class="nav-link">Configuración</a>
+            </nav>
+            <div class="user-info">
+                <img id="avatar" class="user-avatar" src="assets/default-avatar.png" alt="avatar">
+                <span id="nombreUsuario" class="user-name">Cargando...</span>
+                <button class="btn btn-secondary" onclick="logout()">Salir</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div style="margin-bottom: 24px;">
+                <h1>Perfil del profesional</h1>
+            </div>
+
+            <section class="card">
+                <div class="card-content">
+                    <dl style="display:grid; grid-template-columns: max-content 1fr; gap:12px 24px; margin:0;">
+                        <dt style="color: var(--muted, #6b7280);">Nombre</dt>
+                        <dd id="campo-nombre" style="margin:0;">—</dd>
+
+                        <dt style="color: var(--muted, #6b7280);">Email</dt>
+                        <dd id="campo-email" style="margin:0;">—</dd>
+
+                        <dt style="color: var(--muted, #6b7280);">Especialidad</dt>
+                        <dd id="campo-especialidad" style="margin:0;">—</dd>
+
+                        <dt style="color: var(--muted, #6b7280);">Matrícula</dt>
+                        <dd id="campo-matricula" style="margin:0;">—</dd>
+
+                        <dt style="color: var(--muted, #6b7280);">Rol</dt>
+                        <dd id="campo-rol" style="margin:0;">—</dd>
+                    </dl>
+
+                    <p style="color: var(--muted, #6b7280); font-size:0.85em; margin-top:20px;">
+                        * La edición de estos datos todavía no está disponible (falta el endpoint en el backend).
+                    </p>
+                </div>
+            </section>
+        </main>
     </div>
-    <ul class="navbar-links">
-      <li><a href="Home.html">Home</a></li>
-      <li><a href="perfil.html" class="active">Perfil</a></li>
-      <li><a href="Pedido.html">Pedidos</a></li>
-      <li><a href="index.html">Logout</a></li>
-    </ul>
-  </nav>
 
-  <main class="perfil-container">
-    <h1>Perfil de Usuario</h1>
-    <form id="perfil-form" class="perfil-form">
-      <div class="form-group">
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" disabled />
-      </div>
-
-      <div class="form-group">
-        <label for="apellido">Apellido</label>
-        <input type="text" id="apellido" disabled />
-      </div>
-
-      <div class="form-group">
-        <label for="dni">DNI</label>
-        <input type="text" id="dni" />
-      </div>
-
-      <div class="form-group">
-        <label for="telefono">Número de Teléfono</label>
-        <input type="tel" id="telefono" />
-      </div>
-
-      <div class="form-buttons">
-        <button type="submit" class="btn guardar">Guardar Cambios</button>
-      </div>
-    </form>
-  </main>
-
-  <script src="Js/Perfil.js"></script>
+    <script src="Js/config.js"></script>
+    <script src="Js/auth.js"></script>
+    <script src="Js/Perfil.js"></script>
 </body>
 </html>

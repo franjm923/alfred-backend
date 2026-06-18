@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using Alfred2.DBContext;
 using Alfred2.Models;
 using Alfred2.DTOs;
+using Alfred2.Services;
 
 namespace Alfred2.Controladores
 {
@@ -126,7 +126,7 @@ namespace Alfred2.Controladores
             var dur = ext.DuracionMin ?? servicio?.DuracionMin ?? 30;
 
             // Local -> UTC con TZ del médico
-            var tz = GetTimeZone(medico.ZonaHorariaIana);
+            var tz = TimeZoneHelper.Get(medico.ZonaHorariaIana);
             var localInicio = DateTime.SpecifyKind(ext.LocalInicio!.Value, DateTimeKind.Unspecified);
             var inicioUtc = TimeZoneInfo.ConvertTimeToUtc(localInicio, tz);
             var finUtc = inicioUtc.AddMinutes(dur);
@@ -224,7 +224,7 @@ namespace Alfred2.Controladores
                 servicio = servicios.FirstOrDefault(s => low.Contains(s.Nombre.ToLower()))?.Nombre;
 
             // Fecha/hora
-            DateTime? localInicio = TryParseFechaHoraEsAr(texto, medico.ZonaHorariaIana);
+            DateTime? localInicio = SpanishDateParser.TryParse(texto);
 
             // Duración sugerida
             int? dur = servicios.FirstOrDefault(s => s.Nombre.Equals(servicio, StringComparison.OrdinalIgnoreCase))?.DuracionMin;
@@ -252,76 +252,6 @@ namespace Alfred2.Controladores
         {
             // MVP: 30' por defecto
             return 30;
-        }
-
-        private static TimeZoneInfo GetTimeZone(string iana)
-        {
-            try { return TimeZoneInfo.FindSystemTimeZoneById(iana); }
-            catch { return TimeZoneInfo.FindSystemTimeZoneById("America/Argentina/Buenos_Aires"); }
-        }
-
-        // hoy/mañana, lunes..domingo, dd/MM, HH:mm (am/pm/hs opcional)
-        private static DateTime? TryParseFechaHoraEsAr(string texto, string tzId)
-        {
-            var now = DateTime.Now;
-            var ci  = new CultureInfo("es-AR");
-            var tz  = GetTimeZone(tzId);
-            texto   = texto.ToLowerInvariant();
-
-            DateTime? fecha = null;
-
-            if (texto.Contains("hoy")) fecha = now.Date;
-            else if (texto.Contains("mañana")) fecha = now.Date.AddDays(1);
-            else
-            {
-                string[] dias = { "domingo","lunes","martes","miércoles","miercoles","jueves","viernes","sábado","sabado" };
-                for (int i = 0; i < dias.Length; i++)
-                {
-                    if (texto.Contains(dias[i]))
-                    {
-                        var target = (i == 0 || i == 7) ? DayOfWeek.Sunday :
-                                     (i == 6 || i == 8) ? DayOfWeek.Saturday :
-                                     (DayOfWeek)i;
-                        fecha = NextDayOfWeek(now.Date, target);
-                        break;
-                    }
-                }
-            }
-
-            var mFecha = Regex.Match(texto, @"\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b");
-            if (mFecha.Success)
-            {
-                var d = int.Parse(mFecha.Groups[1].Value);
-                var M = int.Parse(mFecha.Groups[2].Value);
-                var y = mFecha.Groups[3].Success ? int.Parse(mFecha.Groups[3].Value) : now.Year;
-                fecha = new DateTime(y, M, d);
-            }
-
-            DateTime? hora = null;
-            var mHora = Regex.Match(texto, @"\b(\d{1,2})[:\.h\\s]?(\d{2})?\s*(am|pm|hs)?\b");
-            if (mHora.Success)
-            {
-                int h = int.Parse(mHora.Groups[1].Value);
-                int min = mHora.Groups[2].Success ? int.Parse(mHora.Groups[2].Value) : 0;
-                var suf = mHora.Groups[3].Success ? mHora.Groups[3].Value : null;
-                if (string.Equals(suf, "pm", StringComparison.OrdinalIgnoreCase) && h < 12) h += 12;
-                if (string.Equals(suf, "am", StringComparison.OrdinalIgnoreCase) && h == 12) h = 0;
-                hora = now.Date.AddHours(h).AddMinutes(min);
-            }
-
-            if (fecha.HasValue && hora.HasValue)
-            {
-                return new DateTime(fecha.Value.Year, fecha.Value.Month, fecha.Value.Day,
-                                    hora.Value.Hour, hora.Value.Minute, 0, DateTimeKind.Unspecified);
-            }
-            return null;
-
-            static DateTime NextDayOfWeek(DateTime from, DayOfWeek day)
-            {
-                int diff = ((int)day - (int)from.DayOfWeek + 7) % 7;
-                if (diff == 0) diff = 7;
-                return from.AddDays(diff);
-            }
         }
 
         private static string NormalizeE164(string s)

@@ -1,249 +1,307 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-AR">
 <head>
-  <meta charset="utf-8" />
-  <title>Alfred — Automatización de pedidos y turnos</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Estilos -->
-  <link rel="stylesheet" href="css/landing.css" />
-  <!-- Íconos Lucide (CDN) -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <title>Alfred — Agenda turnos médicos por WhatsApp con IA</title>
+  <meta name="description" content="Alfred atiende a tus pacientes 24/7 por WhatsApp, confirma turnos, pide los datos faltantes y sincroniza con tu Google Calendar. Hecho para médicos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div class="alfred">
 
-    <!-- ===== Header ===== -->
-    <header class="site-header">
-      <div class="container nav">
-        <div class="brand">
-          <i class="icon" src="assets/AF32.png"></i>
-          <span>Alfred</span>
-        </div>
-        <a class="btn btn-outline btn-sm" href="https://alfredbot.com.ar/login">Iniciar Sesión</a>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header" id="siteHeader">
+    <div class="wrap nav">
+      <a href="index.html" class="brand" aria-label="Alfred, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </span>
+        <span class="brand-name">Alfred</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#producto">Producto</a>
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#precios">Precios</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html" class="ingresar">Ingresar</a>
+        <a href="#empezar" class="btn btn--primary agendar-desktop">Agendar llamada</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- ===== Hero ===== -->
-    <section class="hero py-20 px-4">
-      <div class="container text-center">
-        <span class="badge mb-6">🚀 Automatización Inteligente</span>
-        <h1>
-          Automatiza tus pedidos y turnos con <span class="accent">Alfred</span>
-        </h1>
-        <p>
-          El bot inteligente que revoluciona la gestión de tu negocio. Automatiza pedidos, agenda turnos y mejora la
-          experiencia de tus clientes 24/7.
-        </p>
-
-        <div class="btn-row" style="margin-top: 1.25rem;">
-          <button class="btn btn-primary btn-lg" id="btn-agendar">
-            <i data-lucide="calendar"></i>
-            <span>Agendar Llamada</span>
-          </button>
-          <button class="btn btn-outline btn-lg" id="btn-demo">
-            <span>Ver Demo</span>
-            <i data-lucide="arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Features ===== -->
-    <section class="py-20 px-4">
-      <div class="container">
-        <div class="text-center mb-12">
-          <h2 class="mb-4 title-2">
-            ¿Por qué elegir Alfred?
-          </h2>
-          <p class="muted lead">
-            Descubre cómo Alfred puede transformar la gestión de tu negocio
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <span class="badge"><span class="dot"></span> Hecho para médicos</span>
+          <h1>Agenda turnos por <span class="hl">WhatsApp con IA</span>. Todo queda en tu <span class="hl-2">Google Calendar</span>.</h1>
+          <p class="hero-sub">Alfred atiende a tus pacientes 24/7 por WhatsApp, confirma turnos, pide los datos faltantes y sincroniza con tu calendario.</p>
+          <div class="hero-cta">
+            <a href="#empezar" class="btn btn--primary btn--lg">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14-.01-.31-.01-.47-.01-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
+              Probar por WhatsApp
+            </a>
+            <a href="#empezar" class="btn btn--ghost btn--lg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Agendar una llamada
+            </a>
+          </div>
+          <p class="hero-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Sin instalación. En minutos estás tomando turnos.
           </p>
         </div>
 
-        <div class="grid cards">
-          <!-- Card 1 -->
-          <article class="card">
-            <div class="card-content">
-              <div class="feature-icon">
-                <i data-lucide="message-square"></i>
+        <!-- Mockup de chat de WhatsApp -->
+        <div class="hero-visual">
+          <div class="chat" role="img" aria-label="Conversación de ejemplo: un paciente agenda un turno con Alfred por WhatsApp.">
+            <div class="chat-top">
+              <span class="chat-avatar">A</span>
+              <div>
+                <div class="who">Alfred</div>
+                <div class="status"><span class="dot"></span> en línea</div>
               </div>
-              <h3>Gestión de Pedidos</h3>
-              <p class="muted">
-                Automatiza la recepción y procesamiento de pedidos a través de WhatsApp, reduciendo errores y
-                mejorando la eficiencia.
-              </p>
+              <span class="wa" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2z"/></svg>
+              </span>
             </div>
+            <div class="chat-body">
+              <div class="msg in">Hola, quería sacar un turno 🙏<span class="time">9:41</span></div>
+              <div class="msg out">¡Hola! Soy Alfred. ¿Para qué día buscás el turno?<span class="time">9:41</span></div>
+              <div class="msg in">El jueves a la tarde si se puede<span class="time">9:42</span></div>
+              <div class="msg out">Tengo el jueves 18 a las 16:30. ¿Me pasás tu nombre completo?<span class="time">9:42</span></div>
+              <div class="msg in">María González<span class="time">9:43</span></div>
+              <div class="chat-confirm">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="txt"><strong>Turno confirmado</strong><span>Jue 18 · 16:30 · María González</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="float-card" aria-hidden="true">
+            <span class="ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </span>
+            <div><strong>Sincronizado</strong><span>Google Calendar ✓</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TRUST STRIP ============ -->
+    <div class="trust">
+      <div class="wrap trust-inner">
+        <span class="trust-label">Pensado para el flujo de tu consultorio</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2z"/></svg> WhatsApp</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Google Calendar</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="m9 14 2 2 4-4"/></svg> Exportable a Excel</span>
+        <span class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Atención 24/7</span>
+      </div>
+    </div>
+
+    <!-- ============ PRODUCTO / FEATURES ============ -->
+    <section class="section" id="producto">
+      <div class="wrap">
+        <div class="section-head center">
+          <span class="eyebrow">El producto</span>
+          <h2>Todo lo que tu consultorio necesita para los turnos</h2>
+          <p>Un agente que conversa como vos, registra cada turno y mantiene tu calendario siempre al día.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="card reveal">
+            <span class="card-ico ico-teal" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 3.5a1 1 0 1 0 0 1M15 3.5a1 1 0 1 0 0 1"/><circle cx="9" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.2" fill="currentColor" stroke="none"/><path d="M2 13v3M22 13v3"/></svg>
+            </span>
+            <h3>Agente de WhatsApp inteligente</h3>
+            <p>Entiende mensajes desordenados, pide datos faltantes (nombre, teléfono, fecha), confirma y registra el turno. Tono y reglas personalizadas por médico.</p>
           </article>
 
-          <!-- Card 2 -->
-          <article class="card">
-            <div class="card-content">
-              <div class="feature-icon">
-                <i data-lucide="calendar"></i>
-              </div>
-              <h3>Agenda de Turnos</h3>
-              <p class="muted">
-                Permite a tus clientes agendar citas automáticamente, sincronizando con tu calendario y enviando
-                recordatorios.
-              </p>
-            </div>
+          <article class="card reveal">
+            <span class="card-ico ico-blue" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+            </span>
+            <h3>Sincronizado con Google Calendar</h3>
+            <p>Cada turno confirmado se crea en tu Google Calendar con los datos del paciente. Evitá solapamientos y recordá todo.</p>
           </article>
 
-          <!-- Card 3 -->
-          <article class="card">
-            <div class="card-content">
-              <div class="feature-icon">
-                <i data-lucide="zap"></i>
-              </div>
-              <h3>Disponible 24/7</h3>
-              <p class="muted">
-                Tu asistente virtual nunca duerme. Atiende consultas y procesa solicitudes las 24 horas del día, los 7
-                días de la semana.
-              </p>
+          <article class="card reveal">
+            <span class="card-ico ico-navy" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <h3>Vista web de próximos turnos</h3>
+            <p>Desde la app web ves el calendario semanal y el detalle del día: pacientes pendientes, confirmados y sus datos básicos.</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="card-ico ico-sand" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            </span>
+            <h3>Exportar datos a Excel</h3>
+            <p>Descargá la planilla de pacientes (nombre y teléfono) con un clic.</p>
+            <div class="card-action">
+              <a href="#empezar" class="link-cta">Descargar plantilla
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
             </div>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ===== Video Demo ===== -->
-    <section class="py-20 px-4 section-muted">
-      <div class="container text-center" style="max-width: 960px;">
-        <h2 class="mb-6 title-2">Ve Alfred en acción</h2>
-        <p class="muted mb-12 lead">Descubre cómo Alfred puede transformar tu negocio en solo 2 minutos</p>
+    <!-- ============ CÓMO FUNCIONA ============ -->
+    <section class="section section--cool" id="como-funciona">
+      <div class="wrap">
+        <div class="section-head center">
+          <span class="eyebrow">Cómo funciona</span>
+          <h2>De la conversación al calendario, en cuatro pasos</h2>
+        </div>
 
-        <div class="video-shell">
-          <div class="video-overlay">
-            <button class="play-btn" id="play-demo" aria-label="Reproducir demo">
-              <i data-lucide="play"></i>
-            </button>
+        <div class="how-layout">
+          <div class="steps">
+            <div class="step reveal">
+              <span class="step-num">1</span>
+              <div><h3>Conectamos tu número de WhatsApp</h3><p>Alfred atiende en tu línea o en una dedicada.</p></div>
+            </div>
+            <div class="step reveal">
+              <span class="step-num">2</span>
+              <div><h3>Personalizamos tu perfil</h3><p>Especialidad, horarios, zona, formas de pago y políticas.</p></div>
+            </div>
+            <div class="step reveal">
+              <span class="step-num">3</span>
+              <div><h3>Sincronizamos Google Calendar</h3><p>Confirmás turnos y se crean eventos con los datos del paciente.</p></div>
+            </div>
+            <div class="step reveal">
+              <span class="step-num">4</span>
+              <div><h3>Mirá todo en la app web</h3><p>Calendario semanal y lista de turnos del día.</p></div>
+            </div>
           </div>
-          <div class="video-caption">
-            <p class="mb-0" style="font-weight: 600;">Demo: Automatización de Pedidos con Alfred</p>
-            <small>2:30 min</small>
+
+          <!-- Vista previa de la app web -->
+          <div class="app-preview reveal" role="img" aria-label="Vista previa de la app web: calendario semanal con los turnos confirmados.">
+            <div class="app-bar">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <span class="addr">app.alfred.com.ar/agenda</span>
+              <span class="preview-tag">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Vista previa
+              </span>
+            </div>
+            <div class="app-head">
+              <h4>Semana del 15 al 19</h4>
+              <span class="wk">Junio 2026</span>
+            </div>
+            <div class="cal">
+              <div class="cal-day">
+                <div class="d-name">Lun</div><div class="d-num">15</div>
+                <div class="evt t">09:30 · J. Pérez</div>
+                <div class="evt b">11:00 · L. Díaz</div>
+              </div>
+              <div class="cal-day">
+                <div class="d-name">Mar</div><div class="d-num">16</div>
+                <div class="evt s">10:15 · R. Sosa</div>
+                <div class="evt ghost">Libre</div>
+              </div>
+              <div class="cal-day">
+                <div class="d-name">Mié</div><div class="d-num">17</div>
+                <div class="evt b">08:45 · A. Mansilla</div>
+                <div class="evt r">16:00 · C. Vega</div>
+              </div>
+              <div class="cal-day today">
+                <div class="d-name">Jue</div><div class="d-num">18</div>
+                <div class="evt t">16:30 · M. González</div>
+                <div class="evt b">17:15 · F. Ruiz</div>
+              </div>
+              <div class="cal-day">
+                <div class="d-name">Vie</div><div class="d-num">19</div>
+                <div class="evt s">09:00 · T. Ibáñez</div>
+                <div class="evt ghost">Libre</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== Benefits ===== -->
-    <section class="py-20 px-4">
-      <div class="container">
-        <div class="benefits">
-          <div>
-            <h2 class="mb-6 title-2">
-              Resultados que hablan por sí solos
-            </h2>
-
-            <div class="benefit-row">
-              <i class="tick" data-lucide="check-circle"></i>
-              <div>
-                <h3 class="mb-4" style="margin-bottom:.4rem;">Reduce errores en un 90%</h3>
-                <p class="muted">Elimina los errores humanos en la toma de pedidos y agendamiento de citas</p>
-              </div>
-            </div>
-
-            <div class="benefit-row">
-              <i class="tick" data-lucide="check-circle"></i>
-              <div>
-                <h3 class="mb-4" style="margin-bottom:.4rem;">Ahorra hasta 8 horas diarias</h3>
-                <p class="muted">Automatiza tareas repetitivas y libera tiempo para enfocarte en hacer crecer tu negocio</p>
-              </div>
-            </div>
-
-            <div class="benefit-row">
-              <i class="tick" data-lucide="check-circle"></i>
-              <div>
-                <h3 class="mb-4" style="margin-bottom:.4rem;">Mejora la satisfacción del cliente</h3>
-                <p class="muted">Respuestas instantáneas y servicio 24/7 que tus clientes van a adorar</p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="benefit-visual">
-              <div class="text-center">
-                <i data-lucide="bot" class="benefit-bot"></i>
-                <p class="muted" style="font-size: 1.05rem;">Alfred trabajando para tu negocio</p>
-              </div>
-            </div>
-          </div>
+    <!-- ============ BENEFICIOS ============ -->
+    <section class="section" id="beneficios">
+      <div class="wrap">
+        <div class="section-head center">
+          <span class="eyebrow">Beneficios</span>
+          <h2>Beneficios para tu consultorio</h2>
+        </div>
+        <div class="benefits-grid">
+          <article class="benefit reveal">
+            <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></span>
+            <h3>Menos ausencias</h3>
+            <p>Confirmaciones y recordatorios automáticos por WhatsApp.</p>
+          </article>
+          <article class="benefit reveal">
+            <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+            <h3>Tiempo clínico de valor</h3>
+            <p>Delegá la coordinación; enfocáte en tus pacientes.</p>
+          </article>
+          <article class="benefit reveal">
+            <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
+            <h3>Sin planillas manuales</h3>
+            <p>Todo queda registrado y exportable a Excel.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ===== CTA ===== -->
-    <section class="cta py-20 px-4">
-      <div class="container" style="max-width: 900px;">
-        <h2 class="mb-6 title-2">
-          ¿Listo para automatizar tu negocio?
-        </h2>
-        <p class="mb-8 lead">
-          Agenda una llamada gratuita y descubre cómo Alfred puede transformar tu negocio en 30 días
-        </p>
-
-        <div class="btn-row">
-          <button class="btn btn-lg" style="background:#fff; color:#111;" id="cta-agendar">
-            <i data-lucide="calendar"></i>
-            <span>Agendar Llamada Gratuita</span>
-          </button>
-          <button class="btn btn-outline btn-lg" id="cta-15min" style="border-color: #ffffff55;">
-            <i data-lucide="clock"></i>
-            <span>Solo 15 minutos</span>
-          </button>
+    <!-- ============ CTA FINAL ============ -->
+    <section class="cta-band" id="empezar">
+      <div class="wrap cta-inner">
+        <h2>¿Listo para empezar?</h2>
+        <p>Te ayudamos a implementar Alfred en tu consultorio en minutos.</p>
+        <div class="cta-actions">
+          <a href="#" class="btn btn--primary btn--lg">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm4.52 11.99c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.78.97-.15.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14-.01-.31-.01-.47-.01-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>
+            Hablar por WhatsApp
+          </a>
+          <a href="#" class="btn btn--light btn--lg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Agendar una llamada
+          </a>
         </div>
-
-        <p class="cta-foot">
-          Sin compromiso • Consulta gratuita • Resultados garantizados
-        </p>
+        <p class="cta-login">¿Ya tenés cuenta? <a href="login.html">Ingresá acá.</a></p>
       </div>
     </section>
+  </main>
 
-    <!-- ===== Footer ===== -->
-    <footer class="site-footer py-16 px-4">
-      <div class="container">
-        <div class="footer-top">
-          <div class="brand">
-            <i class="icon" data-lucide="bot"></i>
-            <span class="fw-700">Alfred Bot</span>
-          </div>
-          <nav class="footer-links">
-            <a href="#">Términos</a>
-            <a href="#">Privacidad</a>
-            <a href="#">Contacto</a>
-          </nav>
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer" id="precios">
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="brand">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </span>
+            <span class="brand-name">Alfred</span>
+          </a>
+          <p>Agenda turnos médicos con IA por WhatsApp, sincronizada con tu Google Calendar.</p>
         </div>
-        <div class="footer-bottom">
-          © 2024 Alfred Bot. Todos los derechos reservados.
-        </div>
+        <nav class="footer-nav" aria-label="Pie de página">
+          <a href="#producto">Producto</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#precios">Precios</a>
+          <a href="login.html">Ingresar</a>
+        </nav>
       </div>
-    </footer>
+      <div class="footer-bottom">© 2026 Alfred — Turnos médicos con IA</div>
+    </div>
+  </footer>
 
-  </div>
-
-  <script>
-    // Inicializar íconos Lucide una vez cargado el DOM
-    window.addEventListener('DOMContentLoaded', function () {
-      if (window.lucide && lucide.createIcons) {
-        lucide.createIcons();
-      }
-    });
-
-    // Handlers de demo (ajusta a tus rutas reales)
-    document.addEventListener('click', (e) => {
-      const id = e.target.closest('button')?.id;
-      if (id === 'btn-agendar' || id === 'cta-agendar') {
-        // Reemplaza con tu link de Calendly / WhatsApp
-        alert('Aquí abrirías tu agenda (Calendly/WhatsApp).');
-      }
-      if (id === 'btn-demo' || id === 'play-demo') {
-        // Reemplaza con el link a tu video (YouTube/Vimeo/archivo)
-        alert('Aquí reproducirías la demo.');
-      }
-      if (id === 'cta-15min') {
-        alert('Llamada de 15 minutos: agenda rápida.');
-      }
-    });
-  </script>
+  <script src="Js/main.js"></script>
 </body>
 </html>
