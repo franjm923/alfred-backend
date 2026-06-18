@@ -1,25 +1,18 @@
 using Alfred2.DBContext;
+using Alfred2.Domain.Exceptions;
 using Alfred2.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Alfred2.Services;
 
 /// <summary>Pedido del agente para crear un turno.</summary>
-public record CrearTurnoRequest(Guid MedicoId, Guid PacienteId, DateTime InicioUtc, int DuracionMin = 30);
-
-/// <summary>Se lanza cuando el médico referenciado no existe.</summary>
-public class MedicoNoEncontradoException : Exception
-{
-    public MedicoNoEncontradoException(Guid medicoId)
-        : base($"No existe un médico con id {medicoId}.") { }
-}
-
-/// <summary>Se lanza cuando el horario pedido se solapa con un turno existente del médico.</summary>
-public class HorarioOcupadoException : Exception
-{
-    public HorarioOcupadoException(DateTime inicioUtc)
-        : base($"Ya hay un turno que se solapa con el horario {inicioUtc:o}.") { }
-}
+public record CrearTurnoRequest(
+    Guid MedicoId,
+    Guid PacienteId,
+    DateTime InicioUtc,
+    int DuracionMin = 30,
+    OrigenTurno Origen = OrigenTurno.Telegram,
+    Guid? ServicioId = null);
 
 /// <summary>
 /// Core de dominio que el agente (n8n) invoca para operar turnos.
@@ -36,7 +29,13 @@ public class AgentTurnoService
         if (!await _db.Medicos.AnyAsync(m => m.Id == req.MedicoId))
             throw new MedicoNoEncontradoException(req.MedicoId);
 
-        var finUtc = req.InicioUtc.AddMinutes(req.DuracionMin);
+        // La duración sale del servicio (si se indicó uno válido del médico); si no, la del request.
+        Servicio? servicio = null;
+        if (req.ServicioId is Guid servicioId)
+            servicio = await _db.Servicios.FirstOrDefaultAsync(s => s.Id == servicioId && s.MedicoId == req.MedicoId);
+
+        var duracionMin = servicio?.DuracionMin ?? req.DuracionMin;
+        var finUtc = req.InicioUtc.AddMinutes(duracionMin);
 
         var seSolapa = await _db.Turnos.AnyAsync(t =>
             t.MedicoId == req.MedicoId &&
@@ -49,9 +48,11 @@ public class AgentTurnoService
         {
             MedicoId = req.MedicoId,
             PacienteId = req.PacienteId,
+            ServicioId = servicio?.Id,
             InicioUtc = req.InicioUtc,
             FinUtc = finUtc,
             Estado = EstadoTurno.Confirmado,
+            Origen = req.Origen,
         };
 
         _db.Turnos.Add(turno);

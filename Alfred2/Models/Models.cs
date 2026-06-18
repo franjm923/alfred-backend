@@ -10,7 +10,7 @@ namespace Alfred2.Models;
 #region Enums
 public enum EstadoTurno { Pendiente = 0, Confirmado = 1, Cancelado = 2, NoAsistio = 3, Completado = 4 }
 public enum ModalidadTurno { Presencial = 0, Virtual = 1 }
-public enum OrigenTurno { Manual = 0, WhatsApp = 1, Web = 2 }
+public enum OrigenTurno { Manual = 0, WhatsApp = 1, Web = 2, Telegram = 3 }
 
 public enum EstadoConversacion { Abierta = 0, Archivada = 1 }
 public enum CanalConversacion { WhatsApp = 0 }

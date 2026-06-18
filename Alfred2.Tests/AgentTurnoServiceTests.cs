@@ -1,4 +1,5 @@
 using Alfred2.DBContext;
+using Alfred2.Domain.Exceptions;
 using Alfred2.Models;
 using Alfred2.Services;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,48 @@ public class AgentTurnoServiceTests
         Assert.Equal(inicioUtc, persistido.InicioUtc);
         Assert.Equal(inicioUtc.AddMinutes(30), persistido.FinUtc);
         Assert.Equal(EstadoTurno.Confirmado, persistido.Estado);
+    }
+
+    [Fact]
+    public async Task CrearTurnoAsync_porDefecto_marcaOrigenTelegram()
+    {
+        // Arrange
+        using var db = NuevaDbEnMemoria();
+        var (medico, paciente) = await SembrarMedicoYPacienteAsync(db);
+        var service = new AgentTurnoService(db);
+        var req = new CrearTurnoRequest(medico.Id, paciente.Id,
+            new DateTime(2030, 1, 10, 14, 0, 0, DateTimeKind.Utc));
+
+        // Act
+        await service.CrearTurnoAsync(req);
+
+        // Assert
+        var persistido = await db.Turnos.SingleAsync();
+        Assert.Equal(OrigenTurno.Telegram, persistido.Origen);
+    }
+
+    [Fact]
+    public async Task CrearTurnoAsync_conServicio_usaLaDuracionDelServicio()
+    {
+        // Arrange
+        using var db = NuevaDbEnMemoria();
+        var (medico, paciente) = await SembrarMedicoYPacienteAsync(db);
+        var servicio = new Servicio { MedicoId = medico.Id, Nombre = "Consulta", DuracionMin = 45 };
+        db.Servicios.Add(servicio);
+        await db.SaveChangesAsync();
+
+        var inicioUtc = new DateTime(2030, 1, 10, 14, 0, 0, DateTimeKind.Utc);
+        var service = new AgentTurnoService(db);
+        // sin DuracionMin explícita: debe salir del servicio (45), no el default (30)
+        var req = new CrearTurnoRequest(medico.Id, paciente.Id, inicioUtc, ServicioId: servicio.Id);
+
+        // Act
+        await service.CrearTurnoAsync(req);
+
+        // Assert
+        var persistido = await db.Turnos.SingleAsync();
+        Assert.Equal(servicio.Id, persistido.ServicioId);
+        Assert.Equal(inicioUtc.AddMinutes(45), persistido.FinUtc);
     }
 
     [Fact]
