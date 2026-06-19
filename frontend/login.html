@@ -89,12 +89,11 @@
     </main>
   </div>
 
-  <script src="Js/config.js"></script>
-  <script src="Js/auth.js"></script>
-  <script src="Js/main.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
   <script>
-    // Cableado al backend: el botón de Google inicia el OAuth real.
-    // Capture (true) → corre ANTES del handler de main.js (que deshabilita el botón).
+    // Botón Google → OAuth real. Capture (true) para correr antes de que main.js deshabilite el botón.
     document.getElementById("googleBtn")?.addEventListener("click", function (e) {
       e.preventDefault();
       Alfred.loginConGoogle();

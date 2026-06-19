@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Métricas — Alfred</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar" data-active="metricas"></aside>
+
+    <div class="app-main">
+      <header class="topbar">
+        <button class="icon-btn app-menu-btn" id="appMenuBtn" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div class="greet">
+          <h1>Métricas</h1>
+          <p>Tu actividad de los últimos 6 meses</p>
+        </div>
+        <div class="top-actions" id="topActions"></div>
+      </header>
+
+      <div class="app-content">
+        <section class="metric-row">
+          <div class="metric">
+            <div class="m-top"><span class="m-lbl">Turnos atendidos</span><span class="m-ico ico-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3 9.5h18"/></svg></span></div>
+            <div class="m-num">734</div>
+            <div class="m-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6 13.5 15.5 8.5 10.5 1 18"/><path d="M17 6h6v6"/></svg> +9,2%</div>
+          </div>
+          <div class="metric">
+            <div class="m-top"><span class="m-lbl">Tasa de asistencia</span><span class="m-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+            <div class="m-num">92%</div>
+            <div class="m-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6 13.5 15.5 8.5 10.5 1 18"/><path d="M17 6h6v6"/></svg> +4 pts</div>
+          </div>
+          <div class="metric">
+            <div class="m-top"><span class="m-lbl">Pacientes nuevos</span><span class="m-ico ico-navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span></div>
+            <div class="m-num">58</div>
+            <div class="m-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6 13.5 15.5 8.5 10.5 1 18"/><path d="M17 6h6v6"/></svg> +11</div>
+          </div>
+          <div class="metric">
+            <div class="m-top"><span class="m-lbl">Ausencias</span><span class="m-ico ico-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg></span></div>
+            <div class="m-num">8%</div>
+            <div class="m-trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 18 13.5 8.5 8.5 13.5 1 6"/><path d="M17 18h6v-6"/></svg> -4 pts</div>
+          </div>
+        </section>
+
+        <div class="charts-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <div class="p-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="13" y="7" width="3" height="10" rx="1"/></svg><h2>Turnos por mes</h2></div>
+            </div>
+            <div style="padding: 22px 22px 26px;">
+              <div class="bars">
+                <div class="bar-col"><div class="bar" style="height: 52%;"></div><span class="bar-lbl">Ene</span></div>
+                <div class="bar-col"><div class="bar" style="height: 64%;"></div><span class="bar-lbl">Feb</span></div>
+                <div class="bar-col"><div class="bar" style="height: 58%;"></div><span class="bar-lbl">Mar</span></div>
+                <div class="bar-col"><div class="bar" style="height: 76%;"></div><span class="bar-lbl">Abr</span></div>
+                <div class="bar-col"><div class="bar" style="height: 88%;"></div><span class="bar-lbl">May</span></div>
+                <div class="bar-col"><div class="bar" style="height: 100%;"></div><span class="bar-lbl">Jun</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div class="p-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg><h2>Cobertura</h2></div>
+            </div>
+            <div style="padding: 22px;">
+              <div class="dist">
+                <div class="dist-item"><div class="dl"><span class="k">Obra social</span><span class="v">46%</span></div><div class="dist-track"><div class="dist-fill fill-blue" style="width:46%;"></div></div></div>
+                <div class="dist-item"><div class="dl"><span class="k">Prepaga</span><span class="v">34%</span></div><div class="dist-track"><div class="dist-fill fill-teal" style="width:34%;"></div></div></div>
+                <div class="dist-item"><div class="dl"><span class="k">Particular</span><span class="v">20%</span></div><div class="dist-track"><div class="dist-fill fill-sand" style="width:20%;"></div></div></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>

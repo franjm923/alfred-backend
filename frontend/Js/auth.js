@@ -3,9 +3,9 @@
 // que setea el backend tras el login con Google, por eso todo va con credentials.
 var Alfred = window.Alfred || (window.Alfred = {});
 
-// Redirige a Google. Al volver, el backend manda el navegador a Home.html.
+// Redirige a Google. Al volver, el backend manda el navegador a home.html.
 Alfred.loginConGoogle = function () {
-  const returnUrl = new URL("Home.html", window.location.href).href;
+  const returnUrl = new URL("home.html", window.location.href).href;
   window.location.href =
     `${Alfred.API_BASE}/login/google?returnUrl=${encodeURIComponent(returnUrl)}`;
 };

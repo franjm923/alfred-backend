@@ -429,10 +429,9 @@ app.MapGet("/calendar/oauth-callback", async (
     }
     await db.SaveChangesAsync();
 
-    // Redirigir al frontend
-    var frontendUrl = builder.Configuration["FRONTEND_REDIRECT_URL"] ?? "http://localhost:3000/home";
-    var settingsUrl = frontendUrl.Replace("/home", "/settings");
-    return Results.Redirect(settingsUrl);
+    // Redirigir al frontend (a la home del dashboard)
+    var frontendUrl = builder.Configuration["FRONTEND_REDIRECT_URL"] ?? "http://localhost:3000/home.html";
+    return Results.Redirect(frontendUrl);
 });
 
 // Verificar si el médico tiene Calendar conectado
