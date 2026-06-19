@@ -94,7 +94,11 @@
   <script src="Js/main.js"></script>
   <script>
     // Cableado al backend: el botón de Google inicia el OAuth real.
-    document.getElementById("googleBtn")?.addEventListener("click", Alfred.loginConGoogle);
+    // Capture (true) → corre ANTES del handler de main.js (que deshabilita el botón).
+    document.getElementById("googleBtn")?.addEventListener("click", function (e) {
+      e.preventDefault();
+      Alfred.loginConGoogle();
+    }, true);
   </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 // Js/auth.js
 // Helpers de autenticación reutilizables. La sesión vive en una cookie httpOnly
 // que setea el backend tras el login con Google, por eso todo va con credentials.
-const Alfred = window.Alfred || (window.Alfred = {});
+var Alfred = window.Alfred || (window.Alfred = {});
 
 // Redirige a Google. Al volver, el backend manda el navegador a Home.html.
 Alfred.loginConGoogle = function () {
